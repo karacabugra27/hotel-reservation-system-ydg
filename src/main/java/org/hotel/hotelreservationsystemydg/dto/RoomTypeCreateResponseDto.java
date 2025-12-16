@@ -2,7 +2,7 @@ package org.hotel.hotelreservationsystemydg.dto;
 
 import java.math.BigDecimal;
 
-public class RoomTypeCreateResponse {
+public class RoomTypeCreateResponseDto {
 
     private Long roomTypeCreateId;
     private String name;
