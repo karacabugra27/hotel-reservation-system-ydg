@@ -15,7 +15,9 @@ import org.hotel.hotelreservationsystemydg.repository.PaymentRepository;
 import org.hotel.hotelreservationsystemydg.repository.ReservationRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.service.ReservationService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -36,7 +38,7 @@ public class ReservationServiceImpl implements ReservationService {
         //? oda kontrolü --> müşteri kontrolü
         //?
 
-        boolean roomOccupied = reservationRepository.existsByRoomIdAndCheckOutDateAfterAndCheckInDateBefore(
+        boolean roomOccupied = reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
                 dto.getRoomId(), dto.getCheckOutDate(), dto.getCheckInDate()
         );
 

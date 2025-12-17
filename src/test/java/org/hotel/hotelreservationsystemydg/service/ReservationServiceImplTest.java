@@ -58,7 +58,7 @@ public class ReservationServiceImplTest {
     void odaDoluysaRezervasyonYapilmamali() {
         ReservationRequestDto dto = createValidReservationRequest();
 
-        when(reservationRepository.existsByRoomIdAndCheckOutDateAfterAndCheckInDateBefore(
+        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
         )).thenReturn(true);
 
@@ -78,7 +78,7 @@ public class ReservationServiceImplTest {
     void odaBulunamazsaHataVermeli() {
         ReservationRequestDto dto = createValidReservationRequest();
 
-        when(reservationRepository.existsByRoomIdAndCheckOutDateAfterAndCheckInDateBefore(
+        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
         )).thenReturn(false);
 
@@ -102,7 +102,7 @@ public class ReservationServiceImplTest {
         customer.setFirstName("İsim");
         customer.setLastName("Soyisim");
 
-        when(reservationRepository.existsByRoomIdAndCheckOutDateAfterAndCheckInDateBefore(
+        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
         )).thenReturn(true);
 

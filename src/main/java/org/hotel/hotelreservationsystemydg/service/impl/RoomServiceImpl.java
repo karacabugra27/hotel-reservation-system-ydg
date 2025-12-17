@@ -5,9 +5,11 @@ import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomTypeRepository;
 import org.hotel.hotelreservationsystemydg.service.RoomService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
@@ -21,7 +23,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<RoomResponseDto> getAvailableRooms() {
 
-        return roomRepository.findByStatus(RoomStatus.AVAILABLE)
+        return roomRepository.findByRoomStatus(RoomStatus.AVAILABLE)
                 .stream()
                 .map(room -> {
                     RoomResponseDto dto = new RoomResponseDto();

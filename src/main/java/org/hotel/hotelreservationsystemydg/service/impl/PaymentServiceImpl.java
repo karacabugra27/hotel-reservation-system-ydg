@@ -8,9 +8,11 @@ import org.hotel.hotelreservationsystemydg.model.Reservation;
 import org.hotel.hotelreservationsystemydg.repository.PaymentRepository;
 import org.hotel.hotelreservationsystemydg.repository.ReservationRepository;
 import org.hotel.hotelreservationsystemydg.service.PaymentService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Service
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;

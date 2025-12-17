@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-    List<Room> findByStatus(RoomStatus status);
+    List<Room> findByRoomStatus(RoomStatus status);
 
-    boolean existByRoomNumber(String roomNumber);
+    boolean existsByRoomNumber(String roomNumber);
 
 }
