@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    boolean existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
+    boolean existsByRoomIdAndCheckOutAfterAndCheckInBefore(
             Long roomId,
             LocalDate checkOutDate,
             LocalDate checkInDate

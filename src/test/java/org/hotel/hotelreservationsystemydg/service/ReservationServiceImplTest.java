@@ -5,18 +5,17 @@ import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.enums.PaymentStatus;
 import org.hotel.hotelreservationsystemydg.enums.ReservationStatus;
-import org.hotel.hotelreservationsystemydg.model.Customer;
-import org.hotel.hotelreservationsystemydg.model.Payment;
-import org.hotel.hotelreservationsystemydg.model.Reservation;
-import org.hotel.hotelreservationsystemydg.model.Room;
+import org.hotel.hotelreservationsystemydg.model.*;
 import org.hotel.hotelreservationsystemydg.repository.CustomerRepository;
 import org.hotel.hotelreservationsystemydg.repository.PaymentRepository;
 import org.hotel.hotelreservationsystemydg.repository.ReservationRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.service.impl.ReservationServiceImpl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -26,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ReservationServiceImplTest {
 
     @Mock
@@ -58,7 +58,7 @@ public class ReservationServiceImplTest {
     void odaDoluysaRezervasyonYapilmamali() {
         ReservationRequestDto dto = createValidReservationRequest();
 
-        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
         )).thenReturn(true);
 
@@ -78,7 +78,7 @@ public class ReservationServiceImplTest {
     void odaBulunamazsaHataVermeli() {
         ReservationRequestDto dto = createValidReservationRequest();
 
-        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
         )).thenReturn(false);
 
@@ -92,19 +92,24 @@ public class ReservationServiceImplTest {
 
     //t başarılı rezervasyon
 
+    @Test
     void basariliRezervasyon() {
         ReservationRequestDto dto = createValidReservationRequest();
 
         Room room = new Room();
         room.setRoomNumber("101");
 
+        RoomType roomType = new RoomType();
+        roomType.setName("Single");
+        room.setRoomType(roomType);
+
         Customer customer = new Customer();
         customer.setFirstName("İsim");
         customer.setLastName("Soyisim");
 
-        when(reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
                 anyLong(), any(), any()
-        )).thenReturn(true);
+        )).thenReturn(false);
 
         when(roomRepository.findById(dto.getRoomId()))
                 .thenReturn(Optional.of(room));
@@ -123,13 +128,14 @@ public class ReservationServiceImplTest {
 
         assertNotNull(response);
         assertEquals("101", response.getRoomNumber());
-        assertEquals("CREATEAD", response.getStatus());
+        assertEquals("CREATED", response.getStatus());
 
         verify(reservationRepository).save(any());
     }
 
     //t ödeme yapılmadan check-in
 
+    @Test
     void odemeYapilmadanCheckInYapilamamali() {
         CheckInRequestDto dto = new CheckInRequestDto();
         dto.setReservationId(1L);
@@ -152,6 +158,7 @@ public class ReservationServiceImplTest {
 
     //t başarılı check-in
 
+   @Test
     void basariliCheckIn() {
         // arrange -> parametremiz
         CheckInRequestDto dto = new CheckInRequestDto();

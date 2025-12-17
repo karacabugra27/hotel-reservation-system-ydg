@@ -38,7 +38,7 @@ public class ReservationServiceImpl implements ReservationService {
         //? oda kontrolü --> müşteri kontrolü
         //?
 
-        boolean roomOccupied = reservationRepository.existsByRoom_IdAndCheckOutAfterAndCheckInBefore(
+        boolean roomOccupied = reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
                 dto.getRoomId(), dto.getCheckOutDate(), dto.getCheckInDate()
         );
 
@@ -67,6 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
         response.setCheckOutDate(reservation.getCheckOut());
         response.setRoomNumber(room.getRoomNumber());
         response.setRoomTypeName(room.getRoomType().getName());
+        response.setStatus(reservation.getReservationStatus().name());
 
         return response;
     }
