@@ -13,7 +13,7 @@ public class ReservationResponseDto {
 
     private Long reservationId;
     private String customerName;
-    private Long roomNumber;
+    private String  roomNumber;
     private String roomTypeName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
@@ -27,11 +27,11 @@ public class ReservationResponseDto {
         this.reservationId = reservationId;
     }
 
-    public Long getRoomNumber() {
+    public String getRoomNumber() {
         return roomNumber;
     }
 
-    public void setRoomNumber(Long roomNumber) {
+    public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
     }
 
