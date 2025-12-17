@@ -1,6 +1,7 @@
 package org.hotel.hotelreservationsystemydg.service;
 
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.enums.PaymentStatus;
@@ -89,6 +90,26 @@ public class ReservationServiceImplTest {
                 () -> reservationService.createReservation(dto));
     }
 
+    @Test
+    void musteriBulunamazsaHataVermeli() {
+        ReservationRequestDto dto = createValidReservationRequest();
+
+        Room room = new Room();
+
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
+                anyLong(), any(), any()
+        )).thenReturn(false);
+        when(roomRepository.findById(dto.getRoomId()))
+                .thenReturn(Optional.of(room));
+        when(customerRepository.findById(dto.getCustomerId()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalStateException.class,
+                () -> reservationService.createReservation(dto));
+
+        verify(reservationRepository, never()).save(any());
+    }
+
 
     //t başarılı rezervasyon
 
@@ -158,6 +179,43 @@ public class ReservationServiceImplTest {
 
     //t başarılı check-in
 
+    @Test
+    void odemeDurumuPaidDegilseCheckInYapilamaz() {
+        CheckInRequestDto dto = new CheckInRequestDto();
+        dto.setReservationId(1L);
+
+        Reservation reservation = new Reservation();
+        reservation.setReservationStatus(ReservationStatus.CONFIRMED);
+
+        Payment payment = new Payment();
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+
+        when(reservationRepository.findById(1L))
+                .thenReturn(Optional.of(reservation));
+        when(paymentRepository.findByReservationId(1L))
+                .thenReturn(Optional.of(payment));
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> reservationService.checkIn(dto));
+
+        assertEquals("ödeme tamamlanmamış", exception.getMessage());
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void checkInRezervasyonBulunamazsaHataVermeli() {
+        CheckInRequestDto dto = new CheckInRequestDto();
+        dto.setReservationId(1L);
+
+        when(reservationRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalStateException.class,
+                () -> reservationService.checkIn(dto));
+
+        verify(paymentRepository, never()).findByReservationId(anyLong());
+    }
+
    @Test
     void basariliCheckIn() {
         // arrange -> parametremiz
@@ -188,6 +246,37 @@ public class ReservationServiceImplTest {
 
 
 
+    }
+
+    @Test
+    void checkOutRezervasyonBulunamazsaHataVermeli() {
+        CheckOutRequestDto dto = new CheckOutRequestDto();
+        dto.setReservationId(1L);
+
+        when(reservationRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalStateException.class,
+                () -> reservationService.checkOut(dto));
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void basariliCheckOut() {
+        CheckOutRequestDto dto = new CheckOutRequestDto();
+        dto.setReservationId(1L);
+
+        Reservation reservation = new Reservation();
+        reservation.setReservationStatus(ReservationStatus.CHECKED_IN);
+
+        when(reservationRepository.findById(1L))
+                .thenReturn(Optional.of(reservation));
+
+        reservationService.checkOut(dto);
+
+        assertEquals(ReservationStatus.COMPLETED, reservation.getReservationStatus());
+        verify(reservationRepository).save(reservation);
     }
 
 }
