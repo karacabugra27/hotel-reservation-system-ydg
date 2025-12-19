@@ -6,6 +6,7 @@ import org.hotel.hotelreservationsystemydg.enums.ReservationStatus;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "reservation")
 public class Reservation {
 
     @Id

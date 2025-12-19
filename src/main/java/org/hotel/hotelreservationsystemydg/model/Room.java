@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
 
 @Entity
+@Table(name = "room")
 public class Room {
 
     @Id

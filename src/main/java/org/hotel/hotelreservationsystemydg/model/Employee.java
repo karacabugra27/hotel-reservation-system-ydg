@@ -3,6 +3,7 @@ package org.hotel.hotelreservationsystemydg.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "employee")
 public class Employee {
 
     @Id
