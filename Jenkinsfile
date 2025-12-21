@@ -52,7 +52,7 @@ pipeline {
         stage('5.1- Wait For Application') {
             steps {
                 sh '''
-                for i in {1..30}; do
+                for i in {1..40}; do
                   if curl -s http://localhost:8080/health | grep UP; then
                     echo "App is UP"
                     exit 0
