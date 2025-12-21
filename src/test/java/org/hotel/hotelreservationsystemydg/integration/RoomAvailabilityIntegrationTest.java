@@ -3,7 +3,7 @@ package org.hotel.hotelreservationsystemydg.integration;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
-import org.hotel.hotelreservationsystemydg.integration.config.DisabledSecurityConfig;
+import org.hotel.hotelreservationsystemydg.integration.config.TestSecurityConfig;
 import org.hotel.hotelreservationsystemydg.model.Room;
 import org.hotel.hotelreservationsystemydg.model.RoomType;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
@@ -29,9 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(DisabledSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class RoomAvailabilityIntegrationTest {
 
     private MockMvc mockMvc;

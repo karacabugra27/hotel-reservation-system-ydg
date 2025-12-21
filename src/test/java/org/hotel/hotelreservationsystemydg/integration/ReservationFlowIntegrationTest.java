@@ -1,6 +1,7 @@
 package org.hotel.hotelreservationsystemydg.integration;
 
 import org.hotel.hotelreservationsystemydg.enums.ReservationStatus;
+import org.hotel.hotelreservationsystemydg.integration.config.TestSecurityConfig;
 import org.hotel.hotelreservationsystemydg.model.Customer;
 import org.hotel.hotelreservationsystemydg.model.Reservation;
 import org.hotel.hotelreservationsystemydg.model.Room;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,8 +32,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 class ReservationFlowIntegrationTest {
 
     private MockMvc mockMvc;
