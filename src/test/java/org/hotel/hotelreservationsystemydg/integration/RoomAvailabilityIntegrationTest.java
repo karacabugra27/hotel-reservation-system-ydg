@@ -57,6 +57,7 @@ class RoomAvailabilityIntegrationTest {
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        roomRepository.deleteAll();
 
         if (roomTypeRepository.count() == 0) {
             RoomType roomType = new RoomType();
@@ -66,6 +67,8 @@ class RoomAvailabilityIntegrationTest {
             roomTypeRepository.save(roomType);
         }
     }
+
+
 
     @AfterEach
     void tearDown() {
