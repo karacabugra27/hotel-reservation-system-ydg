@@ -67,11 +67,10 @@ pipeline {
         }
 
         stage('6- Selenium Test 1 - Available Rooms') {
-            environment {
-                APP_BASE_URL = "http://localhost:8080"
-            }
             steps {
-                sh 'mvn test -Dtest=AvailableRoomsSeleniumTest'
+                sh '''
+                docker exec hotel-app mvn test -Dtest=AvailableRoomsSeleniumTest
+                '''
             }
         }
     }
