@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
 import org.hotel.hotelreservationsystemydg.integration.config.TestSecurityConfig;
 import org.hotel.hotelreservationsystemydg.model.Room;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -33,6 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
+@Transactional
+@Rollback
 class RoomAvailabilityIntegrationTest {
 
     private MockMvc mockMvc;
