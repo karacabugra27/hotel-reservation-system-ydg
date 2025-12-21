@@ -46,7 +46,7 @@ pipeline {
             steps {
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
-                sh 'sleep 15'
+                sh 'sleep 25'
             }
         }
 
