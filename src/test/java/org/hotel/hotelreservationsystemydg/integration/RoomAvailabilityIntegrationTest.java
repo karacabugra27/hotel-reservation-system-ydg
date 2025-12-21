@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,14 @@ class RoomAvailabilityIntegrationTest {
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        if (roomTypeRepository.count() == 0) {
+            RoomType roomType = new RoomType();
+            roomType.setName("TEST_TYPE");
+            roomType.setCapacity(2);
+            roomType.setBasePrice(BigDecimal.valueOf(100));
+            roomTypeRepository.save(roomType);
+        }
     }
 
     @AfterEach

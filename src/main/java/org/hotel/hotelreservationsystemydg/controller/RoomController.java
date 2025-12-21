@@ -18,7 +18,7 @@ public class RoomController {
         this.roomService = roomService;
     }
 
-    @GetMapping("/available")
+    @GetMapping("/getAvailableRooms")
     ResponseEntity<List<RoomResponseDto>> getAvailableRooms() {
         List<RoomResponseDto> response = roomService.getAvailableRooms();
         return ResponseEntity.ok(response);

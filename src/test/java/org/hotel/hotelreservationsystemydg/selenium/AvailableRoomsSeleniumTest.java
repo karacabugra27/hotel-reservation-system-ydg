@@ -1,11 +1,13 @@
 package org.hotel.hotelreservationsystemydg.selenium;
 
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@Tag("selenium")
 public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
 
     @Test
