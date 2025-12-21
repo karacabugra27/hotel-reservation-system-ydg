@@ -42,6 +42,15 @@ pipeline {
             }
         }
 
+        stage('Docker Cleanup') {
+            steps {
+                sh '''
+                docker rm -f hotel-postgres || true
+                docker rm -f hotel-app || true
+                '''
+            }
+        }
+
         stage('5- Run System (Docker)') {
             steps {
                 sh 'docker-compose down || true'
