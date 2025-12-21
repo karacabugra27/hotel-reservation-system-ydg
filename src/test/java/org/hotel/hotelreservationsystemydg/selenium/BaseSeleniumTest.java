@@ -2,14 +2,17 @@ package org.hotel.hotelreservationsystemydg.selenium;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
-import org.springframework.test.context.ActiveProfiles;
 
-import static io.restassured.RestAssured.given;
-@ActiveProfiles("selenium")
-public class BaseSeleniumTest {
+public abstract class BaseSeleniumTest {
 
     @BeforeAll
     static void setup() {
-        RestAssured.baseURI = "http://localhost:8080";
+        String baseUrl = System.getenv("APP_BASE_URL");
+
+        if (baseUrl == null || baseUrl.isBlank()) {
+            baseUrl = "http://localhost:8080";
+        }
+
+        RestAssured.baseURI = baseUrl;
     }
 }
