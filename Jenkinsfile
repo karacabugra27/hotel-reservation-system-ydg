@@ -22,7 +22,7 @@ pipeline {
 
         stage('3- Unit Tests') {
             steps {
-                sh 'mvn test -DskipITs=true'
+                sh 'mvn test'
             }
             post {
                 always {
@@ -33,7 +33,7 @@ pipeline {
 
         stage('4- Integration Tests') {
             steps {
-                sh 'mvn test -DskipITs=false'
+                sh 'mvn test'
             }
             post {
                 always {
@@ -46,20 +46,28 @@ pipeline {
             steps {
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
-                sh 'sleep 25'
+            }
+        }
+
+        stage('5.1- Wait For Application') {
+            steps {
+                sh '''
+                until curl -s http://localhost:8080/room/getAvailableRooms; do
+                  echo "Waiting for app..."
+                  sleep 3
+                done
+                '''
             }
         }
 
         stage('6- Selenium Test 1 - Available Rooms') {
             environment {
-                APP_BASE_URL = 'http://localhost:8080'
+                APP_BASE_URL = "http://localhost:8080"
             }
             steps {
                 sh 'mvn test -Dtest=AvailableRoomsSeleniumTest'
             }
         }
-
-
     }
 
     post {
