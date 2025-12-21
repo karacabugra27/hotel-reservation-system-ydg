@@ -1,7 +1,7 @@
 package org.hotel.hotelreservationsystemydg.integration;
 
 import org.hotel.hotelreservationsystemydg.enums.ReservationStatus;
-import org.hotel.hotelreservationsystemydg.integration.config.DisabledSecurityConfig;
+import org.hotel.hotelreservationsystemydg.integration.config.TestSecurityConfig;
 import org.hotel.hotelreservationsystemydg.model.Customer;
 import org.hotel.hotelreservationsystemydg.model.Reservation;
 import org.hotel.hotelreservationsystemydg.model.Room;
@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(DisabledSecurityConfig.class)
+@Import(TestSecurityConfig.class)
 class PaymentIntegrationTest {
 
     private MockMvc mockMvc;
