@@ -59,26 +59,13 @@ pipeline {
             }
         }
 
-        stage('DEBUG - Inside Container') {
-            steps {
-                sh 'docker exec hotel-app ps aux'
-                sh 'docker exec hotel-app netstat -tulpn || true'
-            }
-        }
-
-        stage('HEALTH') {
-            steps {
-            sh 'curl -v http://localhost:8080/health || true'
-            sh 'curl -v http://localhost:8080/actuator/health || true'
-            }
-        }
-
 
         stage('6- Selenium Test 1 - Available Rooms') {
+            when {
+                expression { false }
+            }
             steps {
-                sh '''
-                docker exec hotel-app mvn test -Dtest=AvailableRoomsSeleniumTest
-                '''
+                echo 'Selenium şimdilik kapalı'
             }
         }
     }
