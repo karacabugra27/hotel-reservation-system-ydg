@@ -2,6 +2,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <profiles>
+
+        <!-- Unit Test -->
+        <profile>
+            <id>unit</id>
+            <properties>
+                <skipITs>true</skipITs>
+            </properties>
+        </profile>
+
+        <!-- Integration Test -->
+        <profile>
+            <id>integration</id>
+            <properties>
+                <skipITs>false</skipITs>
+            </properties>
+        </profile>
+
+        <!-- Selenium -->
+        <profile>
+            <id>selenium</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+
+    </profiles>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
