@@ -52,10 +52,16 @@ pipeline {
         stage('5.1- Wait For Application') {
             steps {
                 sh '''
-                until curl -s http://localhost:8080/room/getAvailableRooms; do
+                for i in {1..30}; do
+                  if curl -s http://localhost:8080/health | grep UP; then
+                    echo "App is UP"
+                    exit 0
+                  fi
                   echo "Waiting for app..."
                   sleep 3
                 done
+                echo "App did not start in time"
+                exit 1
                 '''
             }
         }
