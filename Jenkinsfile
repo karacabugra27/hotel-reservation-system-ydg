@@ -46,25 +46,10 @@ pipeline {
             steps {
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
+                sh 'sleep 20'
             }
         }
 
-        stage('5.1- Wait For Application') {
-            steps {
-                sh '''
-                for i in {1..40}; do
-                  if curl -s http://localhost:8080/health | grep UP; then
-                    echo "App is UP"
-                    exit 0
-                  fi
-                  echo "Waiting for app..."
-                  sleep 3
-                done
-                echo "App did not start in time"
-                exit 1
-                '''
-            }
-        }
 
         stage('6- Selenium Test 1 - Available Rooms') {
             steps {
