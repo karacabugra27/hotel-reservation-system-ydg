@@ -16,7 +16,7 @@ public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
         given()
                 .accept(ContentType.JSON)
                 .when()
-                .get("/room/available")
+                .get("/room/getAvailableRooms")
                 .then()
                 .statusCode(200)
                 .body("$", is(not(empty())))
