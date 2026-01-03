@@ -6,6 +6,8 @@ public class RoomResponseDto {
     private String roomTypeName;
     private String roomNumber;
     private String status;
+    private Integer capacity;
+    private java.math.BigDecimal basePrice;
 
     public Long getId() {
         return id;
@@ -37,5 +39,21 @@ public class RoomResponseDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public java.math.BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(java.math.BigDecimal basePrice) {
+        this.basePrice = basePrice;
     }
 }

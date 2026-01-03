@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.repository;
 
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
 import org.hotel.hotelreservationsystemydg.model.Room;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +15,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     boolean existsByRoomNumber(String roomNumber);
 
     Optional<Room> findByRoomNumber(String roomNumber);
+
+    @EntityGraph(attributePaths = "roomType")
+    Optional<Room> findWithRoomTypeById(Long id);
 }

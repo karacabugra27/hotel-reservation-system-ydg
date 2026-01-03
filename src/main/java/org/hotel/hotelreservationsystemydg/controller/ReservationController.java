@@ -7,10 +7,14 @@ import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.service.ReservationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
@@ -39,6 +43,17 @@ public class ReservationController {
     ResponseEntity<Void> checkOut(@Valid @RequestBody CheckOutRequestDto dto) {
         reservationService.checkOut(dto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    ResponseEntity<List<ReservationResponseDto>> getReservations() {
+        return ResponseEntity.ok(reservationService.getReservations());
+    }
+
+    @PostMapping("/cancel/{reservationId}")
+    ResponseEntity<ReservationResponseDto> cancelReservation(@PathVariable Long reservationId) {
+        ReservationResponseDto response = reservationService.cancelReservation(reservationId);
+        return ResponseEntity.ok(response);
     }
 
 

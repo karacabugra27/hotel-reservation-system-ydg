@@ -16,6 +16,9 @@ import org.hotel.hotelreservationsystemydg.repository.ReservationRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.service.ReservationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -60,16 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservationRepository.save(reservation);
 
-        ReservationResponseDto response = new ReservationResponseDto();
-        response.setReservationId(reservation.getId());
-        response.setCustomerName(customer.getFirstName() + " " + customer.getLastName());
-        response.setCheckInDate(reservation.getCheckIn());
-        response.setCheckOutDate(reservation.getCheckOut());
-        response.setRoomNumber(room.getRoomNumber());
-        response.setRoomTypeName(room.getRoomType().getName());
-        response.setStatus(reservation.getReservationStatus().name());
-
-        return response;
+        return mapToResponse(reservation);
     }
 
     @Override
@@ -96,5 +90,48 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setReservationStatus(ReservationStatus.COMPLETED);
         reservationRepository.save(reservation);
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDto> getReservations() {
+        return reservationRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public ReservationResponseDto cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalStateException("reservasyon bulunamadı"));
+
+        reservation.setReservationStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(reservation);
+        return mapToResponse(reservation);
+    }
+
+    private ReservationResponseDto mapToResponse(Reservation reservation) {
+        ReservationResponseDto response = new ReservationResponseDto();
+        response.setReservationId(reservation.getId());
+        if (reservation.getCustomer() != null) {
+            response.setCustomerName(
+                    reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName());
+        } else {
+            response.setCustomerName("Bilinmiyor");
+        }
+        response.setCheckInDate(reservation.getCheckIn());
+        response.setCheckOutDate(reservation.getCheckOut());
+        if (reservation.getRoom() != null) {
+            response.setRoomNumber(reservation.getRoom().getRoomNumber());
+            if (reservation.getRoom().getRoomType() != null) {
+                response.setRoomTypeName(reservation.getRoom().getRoomType().getName());
+            }
+        }
+        if (reservation.getReservationStatus() != null) {
+            response.setStatus(reservation.getReservationStatus().name());
+        }
+        return response;
     }
 }

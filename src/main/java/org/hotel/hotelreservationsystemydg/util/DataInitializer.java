@@ -1,9 +1,11 @@
 package org.hotel.hotelreservationsystemydg.util;
 
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
+import org.hotel.hotelreservationsystemydg.model.Customer;
 import org.hotel.hotelreservationsystemydg.model.Role;
 import org.hotel.hotelreservationsystemydg.model.Room;
 import org.hotel.hotelreservationsystemydg.model.RoomType;
+import org.hotel.hotelreservationsystemydg.repository.CustomerRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoleRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomTypeRepository;
@@ -18,13 +20,16 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final CustomerRepository customerRepository;
 
     public DataInitializer(RoleRepository roleRepository,
                            RoomTypeRepository roomTypeRepository,
-                           RoomRepository roomRepository) {
+                           RoomRepository roomRepository,
+                           CustomerRepository customerRepository) {
         this.roleRepository = roleRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.roomRepository = roomRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -71,6 +76,14 @@ public class DataInitializer implements CommandLineRunner {
 
             roomRepository.save(room101);
             roomRepository.save(room102);
+        }
+
+        if (customerRepository.count() == 0) {
+            Customer demo = new Customer();
+            demo.setFirstName("Demo");
+            demo.setLastName("Student");
+            demo.setNumber("5551234567");
+            customerRepository.save(demo);
         }
     }
 }

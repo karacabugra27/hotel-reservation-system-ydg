@@ -8,4 +8,8 @@ public interface RoomService {
 
     List<RoomResponseDto> getAvailableRooms();
 
+    RoomResponseDto getRoomById(Long id);
+
+    List<RoomResponseDto> getAvailableRoomsForDates(java.time.LocalDate checkIn,
+                                                    java.time.LocalDate checkOut);
 }

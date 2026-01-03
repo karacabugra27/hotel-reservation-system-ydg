@@ -1,18 +1,23 @@
 package org.hotel.hotelreservationsystemydg.selenium;
 
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeAll;
-
 public abstract class BaseSeleniumTest {
 
-    @BeforeAll
-    static void setup() {
+    protected String getBaseUrl() {
         String baseUrl = System.getenv("APP_BASE_URL");
 
         if (baseUrl == null || baseUrl.isBlank()) {
             baseUrl = "http://localhost:8080";
         }
 
-        RestAssured.baseURI = baseUrl;
+        return baseUrl;
+    }
+
+    protected boolean isHeadless() {
+        String envValue = System.getenv("SELENIUM_HEADLESS");
+        if (envValue != null && !envValue.isBlank()) {
+            return Boolean.parseBoolean(envValue);
+        }
+
+        return Boolean.getBoolean("selenium.headless");
     }
 }

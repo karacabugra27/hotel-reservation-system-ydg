@@ -5,6 +5,8 @@ import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 
+import java.util.List;
+
 public interface ReservationService {
 
     ReservationResponseDto createReservation(ReservationRequestDto request);
@@ -13,6 +15,8 @@ public interface ReservationService {
 
     void checkOut(CheckOutRequestDto request);
 
+    List<ReservationResponseDto> getReservations();
 
+    ReservationResponseDto cancelReservation(Long reservationId);
 
 }

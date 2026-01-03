@@ -2,8 +2,10 @@ package org.hotel.hotelreservationsystemydg.config;
 
 import jakarta.annotation.PostConstruct;
 import org.hotel.hotelreservationsystemydg.enums.RoomStatus;
+import org.hotel.hotelreservationsystemydg.model.Customer;
 import org.hotel.hotelreservationsystemydg.model.Room;
 import org.hotel.hotelreservationsystemydg.model.RoomType;
+import org.hotel.hotelreservationsystemydg.repository.CustomerRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomRepository;
 import org.hotel.hotelreservationsystemydg.repository.RoomTypeRepository;
 import org.springframework.context.annotation.Profile;
@@ -17,11 +19,14 @@ public class SeleniumDataInitializer {
 
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final CustomerRepository customerRepository;
 
     public SeleniumDataInitializer(RoomTypeRepository roomTypeRepository,
-                                   RoomRepository roomRepository) {
+                                   RoomRepository roomRepository,
+                                   CustomerRepository customerRepository) {
         this.roomTypeRepository = roomTypeRepository;
         this.roomRepository = roomRepository;
+        this.customerRepository = customerRepository;
     }
 
     @PostConstruct
@@ -48,5 +53,13 @@ public class SeleniumDataInitializer {
         occupiedRoom.setRoomType(standard);
         occupiedRoom.setRoomStatus(RoomStatus.OCCUPIED);
         roomRepository.save(occupiedRoom);
+
+        if (customerRepository.count() == 0) {
+            Customer demo = new Customer();
+            demo.setFirstName("Selenium");
+            demo.setLastName("Student");
+            demo.setNumber("5550000000");
+            customerRepository.save(demo);
+        }
     }
 }
