@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { cancelReservation, getReservations } from "../services/reservationService";
+import {
+  cancelReservation,
+  getReservations,
+} from "../services/reservationService";
 import { reservationStatusLabel } from "../utils/roomLabels";
 
 function ReservationListPage() {
@@ -10,7 +13,7 @@ function ReservationListPage() {
   useEffect(() => {
     getReservations()
       .then((response) => setReservations(response.data))
-      .catch(() => setErrorMessage("Rezervasyonlar yuklenemedi."))
+      .catch(() => setErrorMessage("Rezervasyonlar yüklenemedi."))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -19,7 +22,9 @@ function ReservationListPage() {
       const response = await cancelReservation(reservationId);
       setReservations((prev) =>
         prev.map((reservation) =>
-          reservation.reservationId === reservationId ? response.data : reservation
+          reservation.reservationId === reservationId
+            ? response.data
+            : reservation
         )
       );
     } catch (error) {
@@ -30,11 +35,14 @@ function ReservationListPage() {
   return (
     <div className="space-y-6" data-testid="reservations-page">
       <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-900" data-testid="reservations-title">
-          Rezervasyon Kayitlari
+        <h1
+          className="text-3xl font-semibold text-slate-900"
+          data-testid="reservations-title"
+        >
+          Rezervasyon Kayıtları
         </h1>
         <p className="mt-2 text-base text-slate-600">
-          Tum rezervasyonlarinizin guncel durumunu goruntuleyin.
+          Tüm rezervasyonların kayıtları görüntüleniyor.
         </p>
       </div>
 
@@ -61,7 +69,7 @@ function ReservationListPage() {
           className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm"
           data-testid="reservations-empty"
         >
-          Henuz rezervasyon bulunamadi.
+          Henüz rezervasyon bulunamadı.
         </div>
       )}
 
@@ -106,7 +114,7 @@ function ReservationListPage() {
                         onClick={() => handleCancel(reservation.reservationId)}
                         disabled={isCancelled || isCompleted}
                       >
-                        Iptal Et
+                        İptal Et
                       </button>
                     </td>
                   </tr>

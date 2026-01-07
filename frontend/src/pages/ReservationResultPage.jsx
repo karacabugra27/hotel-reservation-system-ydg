@@ -8,7 +8,7 @@ function ReservationResultPage() {
   const isSuccess = result?.success;
   const data = result?.data;
   const message =
-    result?.message || "Sonuc bulunamadi. Lutfen yeniden deneyin.";
+    result?.message || "Sonuç bulunamadı. Lütfen yeniden deneyin.";
 
   return (
     <div className="space-y-6" data-testid="reservation-result-page">
@@ -17,10 +17,10 @@ function ReservationResultPage() {
           className="text-3xl font-semibold text-slate-900"
           data-testid="reservation-result-title"
         >
-        Rezervasyon Sonucu
-      </h1>
+          Rezervasyon Sonucu
+        </h1>
         <p className="mt-2 text-base text-slate-600">
-          Rezervasyon isteginizin sonucu burada goruntulenir.
+          Rezervasyon isteğinizin sonucu burada görüntülenir.
         </p>
       </div>
 
@@ -29,7 +29,7 @@ function ReservationResultPage() {
           className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
           data-testid="reservation-success"
         >
-          Rezervasyonunuz basariyla alindi.
+          Rezervasyonunuz başarıyla alındı.
         </div>
       ) : (
         <div
@@ -59,7 +59,7 @@ function ReservationResultPage() {
           to="/reservations"
           data-testid="go-to-reservations"
         >
-          Rezervasyonlari Goruntule
+          Rezervasyonları Görüntüle
         </Link>
       </div>
     </div>

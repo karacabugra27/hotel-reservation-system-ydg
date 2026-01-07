@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getRoomById } from "../services/roomService";
-import { roomImageByType, roomStatusLabel, roomTypeLabel } from "../utils/roomLabels";
+import {
+  roomImageByType,
+  roomStatusLabel,
+  roomTypeLabel,
+} from "../utils/roomLabels";
 
 function RoomDetailPage() {
   const { id } = useParams();
@@ -18,20 +22,20 @@ function RoomDetailPage() {
 
   useEffect(() => {
     if (!id) {
-      setErrorMessage("Oda bulunamadi.");
+      setErrorMessage("Oda bulunamadı.");
       setIsLoading(false);
       return;
     }
 
     getRoomById(id)
       .then((response) => setRoom(response.data))
-      .catch(() => setErrorMessage("Oda detayi yuklenemedi."))
+      .catch(() => setErrorMessage("Oda detayı yüklenemedi."))
       .finally(() => setIsLoading(false));
   }, [id]);
 
   const handleReserve = () => {
     if (!room?.id) {
-      setErrorMessage("Oda secilemedi.");
+      setErrorMessage("Oda seçilemedi.");
       return;
     }
     navigate(`/reserve?roomId=${room.id}`, { state: { roomId: room.id } });
@@ -40,11 +44,14 @@ function RoomDetailPage() {
   return (
     <div className="space-y-6" data-testid="room-detail-page">
       <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-900" data-testid="room-detail-title">
-          Oda Detayi
+        <h1
+          className="text-3xl font-semibold text-slate-900"
+          data-testid="room-detail-title"
+        >
+          Oda Detayı
         </h1>
         <p className="mt-2 text-base text-slate-600">
-          Odanin detaylarini inceleyip rezervasyon yapabilirsiniz.
+          Odanın detaylarını inceleyip rezervasyon yapabilirsiniz.
         </p>
       </div>
 
@@ -53,7 +60,7 @@ function RoomDetailPage() {
           className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm"
           data-testid="room-detail-loading"
         >
-          Yukleniyor...
+          Yükleniyor...
         </div>
       )}
 
@@ -95,12 +102,6 @@ function RoomDetailPage() {
                       Oda {room.roomNumber} • {roomTypeLabel(room.roomTypeName)}
                     </h2>
                   </div>
-                  <span
-                    className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"
-                    data-testid="room-detail-status"
-                  >
-                    {roomStatusLabel(room.status)}
-                  </span>
                 </div>
                 <div className="mt-4 grid gap-4 text-sm text-slate-700 sm:grid-cols-2">
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -122,7 +123,7 @@ function RoomDetailPage() {
                       className="mt-2 text-lg font-semibold text-slate-900"
                       data-testid="room-detail-capacity"
                     >
-                      {room.capacity ?? "-"} kisi
+                      {room.capacity ?? "-"} kişi
                     </p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -138,7 +139,7 @@ function RoomDetailPage() {
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
                     <p className="text-xs uppercase tracking-wide text-slate-400">
-                      Gecelik Ucret
+                      Gecelik Ücret
                     </p>
                     <p
                       className="mt-2 text-lg font-semibold text-slate-900"
@@ -152,14 +153,14 @@ function RoomDetailPage() {
 
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Konaklama Avantajlari
+                  Konaklama Avantajları
                 </h3>
                 <ul className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
                   {[
-                    "Ucretsiz Wi-Fi",
-                    "Kahvalti dahil",
-                    "Giris 14:00, Cikis 12:00",
-                    "Günluk oda servisi",
+                    "Ücretsiz Wi-Fi",
+                    "Kahvaltı Dahil",
+                    "Giriş 14:00 - Çıkış 12:00",
+                    "Günlük Oda Servisi",
                   ].map((item) => (
                     <li
                       key={item}
@@ -175,10 +176,10 @@ function RoomDetailPage() {
             <div className="w-full max-w-sm space-y-4">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Rezervasyon Hazir
+                  Rezervasyon Hazır
                 </h3>
                 <p className="mt-2 text-sm text-slate-600">
-                  Tarihlerinizi secerek rezervasyon talebinizi olusturun.
+                  Tarihlerinizi seçerek rezervasyon talebinizi oluşturun.
                 </p>
                 <button
                   type="button"
@@ -194,7 +195,7 @@ function RoomDetailPage() {
                 className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
                 data-testid="room-detail-back"
               >
-                Odalara Don
+                Odalara Dön
               </Link>
             </div>
           </div>

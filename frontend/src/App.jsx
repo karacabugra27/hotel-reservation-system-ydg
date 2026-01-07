@@ -9,7 +9,10 @@ import ReservationResultPage from "./pages/ReservationResultPage";
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900" data-testid="app-shell">
+    <div
+      className="min-h-screen bg-slate-50 text-slate-900"
+      data-testid="app-shell"
+    >
       <header
         className="border-b border-slate-200 bg-white"
         data-testid="app-header"
@@ -35,7 +38,7 @@ function App() {
               className="text-sm font-medium text-slate-700 hover:text-indigo-700"
               data-testid="nav-reservations"
             >
-              Rezervasyon Kayitlari
+              Rezervasyon Kayıtları
             </Link>
             <Link
               to="/reserve"

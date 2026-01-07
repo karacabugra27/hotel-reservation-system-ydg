@@ -12,7 +12,7 @@ function RoomsPage() {
   useEffect(() => {
     getRooms()
       .then((res) => setRooms(res.data))
-      .catch(() => setErrorMessage("Odalar yuklenirken hata olustu."))
+      .catch(() => setErrorMessage("Odalar yüklenirken hata oluştu."))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -68,7 +68,7 @@ function RoomsPage() {
           className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm"
           data-testid="rooms-loading"
         >
-          Yukleniyor...
+          Yükleniyor...
         </div>
       )}
 
@@ -86,7 +86,7 @@ function RoomsPage() {
           className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700"
           data-testid="rooms-empty"
         >
-          Musait oda bulunamadi.
+          Müsait oda bulunamadı...
         </div>
       )}
 

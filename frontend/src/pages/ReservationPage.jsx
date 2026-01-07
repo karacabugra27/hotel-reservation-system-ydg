@@ -29,7 +29,9 @@ function ReservationPage() {
   }, [location.state, searchParams]);
 
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
-  const selectedRoom = availableRooms.find((room) => room.id === selectedRoomId);
+  const selectedRoom = availableRooms.find(
+    (room) => room.id === selectedRoomId
+  );
 
   useEffect(() => {
     setSelectedRoomId(initialRoomId);
@@ -51,17 +53,19 @@ function ReservationPage() {
     setAvailabilityStatus("info");
 
     if (!formState.checkInDate || !formState.checkOutDate) {
-      setErrorMessage("Lutfen giris ve cikis tarihlerini girin.");
+      setErrorMessage("Lütgen giriş ve çıkış tarihlerini girin.");
       return;
     }
 
     if (!selectedRoomId) {
-      setErrorMessage("Lutfen tarih secip uygun odalar arasindan oda belirleyin.");
+      setErrorMessage(
+        "Lütfen tarih seçip uygun odalar arasından oda belirleyin."
+      );
       return;
     }
 
     if (formState.checkOutDate <= formState.checkInDate) {
-      setErrorMessage("Cikis tarihi giris tarihinden sonra olmali.");
+      setErrorMessage("Çıkış tarihi giris tarihinden sonra olmalı.");
       return;
     }
 
@@ -77,10 +81,12 @@ function ReservationPage() {
         roomsToCheck = availabilityResponse.data;
       }
 
-      const isAvailable = roomsToCheck.some((room) => room.id === selectedRoomId);
+      const isAvailable = roomsToCheck.some(
+        (room) => room.id === selectedRoomId
+      );
       if (!isAvailable) {
         setAvailabilityMessage(
-          "Secilen oda bu tarihlerde musait degil. Lutfen baska oda secin."
+          "Seçilen oda bu tarihlerde müsait değil. Lütfen başka oda seçin."
         );
         setAvailabilityStatus("warning");
         setIsSubmitting(false);
@@ -91,7 +97,6 @@ function ReservationPage() {
         import.meta.env.VITE_DEFAULT_CUSTOMER_ID || 1
       );
 
-      // Backend mevcut yapida customerId bekledigi icin varsayilan bir ID kullanilir.
       const payload = {
         customerId: defaultCustomerId,
         roomId: selectedRoomId,
@@ -107,7 +112,7 @@ function ReservationPage() {
       navigate("/reserve/result", {
         state: {
           success: false,
-          message: "Rezervasyon olusturulamadi. Lutfen tekrar deneyin.",
+          message: "Rezervasyon oluşturulamadı. Lütfen tekrar deneyin.",
         },
       });
     } finally {
@@ -127,7 +132,7 @@ function ReservationPage() {
       setAvailableRooms([]);
       setAvailabilityMessage("");
       setAvailabilityStatus("info");
-      setErrorMessage("Cikis tarihi giris tarihinden sonra olmali.");
+      setErrorMessage("Çıkış tarihi giriş tarihinden sonra olmalı.");
       return;
     }
 
@@ -140,32 +145,34 @@ function ReservationPage() {
         if (!active) {
           return;
         }
-      setAvailableRooms(response.data);
+        setAvailableRooms(response.data);
 
         if (response.data.length === 0) {
-          setAvailabilityMessage("Bu tarihlerde musait oda bulunamadi.");
+          setAvailabilityMessage("Bu tarihlerde müsait oda bulunamadı.");
           setAvailabilityStatus("warning");
           setSelectedRoomId(null);
           return;
         }
 
         if (selectedRoomId) {
-          const match = response.data.some((room) => room.id === selectedRoomId);
+          const match = response.data.some(
+            (room) => room.id === selectedRoomId
+          );
           if (!match) {
             setAvailabilityMessage(
-              "Secili oda bu tarihlerde musait degil. Lutfen baska oda secin."
+              "Seçili oda bu tarihlerde müsait değil. Lütfen başka oda seçin."
             );
             setAvailabilityStatus("warning");
             setSelectedRoomId(null);
           } else {
-            setAvailabilityMessage("Secili oda bu tarihlerde musait.");
+            setAvailabilityMessage("Seçili oda bu tarihlerde müsait.");
             setAvailabilityStatus("success");
           }
         }
       })
       .catch(() => {
         if (active) {
-          setErrorMessage("Musait odalar yuklenemedi.");
+          setErrorMessage("Müsait odalar yüklenemedi.");
         }
       })
       .finally(() => {
@@ -182,23 +189,19 @@ function ReservationPage() {
   return (
     <div className="space-y-6" data-testid="reservation-page">
       <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-900" data-testid="reservation-title">
+        <h1
+          className="text-3xl font-semibold text-slate-900"
+          data-testid="reservation-title"
+        >
           Rezervasyon Talebi
         </h1>
-        <p className="mt-2 text-base text-slate-600" data-testid="reservation-subtitle">
-          Tarihlerinizi secin, uygun odayi belirleyin ve rezervasyonunuzu tamamlayin.
+        <p
+          className="mt-2 text-base text-slate-600"
+          data-testid="reservation-subtitle"
+        >
+          Tarihlerinizi seçin, uygun odayı belirleyin ve rezervasyonunuzu
+          tamamlayın.
         </p>
-        {selectedRoomId && (
-          <p
-            className="mt-3 text-sm text-slate-500"
-            data-testid="reservation-room-selected"
-          >
-            Secilen oda:{" "}
-            {selectedRoom
-              ? `Oda ${selectedRoom.roomNumber} - ${roomTypeLabel(selectedRoom.roomTypeName)}`
-              : "Oda seciminiz kaydedildi"}
-          </p>
-        )}
       </div>
 
       {errorMessage && (
@@ -230,7 +233,7 @@ function ReservationPage() {
       >
         <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-sm text-slate-700">
-            <span className="font-semibold text-slate-900">Giris Tarihi</span>
+            <span className="font-semibold text-slate-900">Giriş Tarihi</span>
             <input
               type="date"
               name="checkInDate"
@@ -242,7 +245,7 @@ function ReservationPage() {
             />
           </label>
           <label className="grid gap-2 text-sm text-slate-700">
-            <span className="font-semibold text-slate-900">Cikis Tarihi</span>
+            <span className="font-semibold text-slate-900">Çıkış Tarihi</span>
             <input
               type="date"
               name="checkOutDate"
@@ -259,8 +262,8 @@ function ReservationPage() {
           {availableRooms.length === 0 && (
             <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
               {isChecking
-                ? "Musait odalar kontrol ediliyor..."
-                : "Tarih secimi yapip uygun odalari goruntuleyin."}
+                ? "Müsait odalar kontrol ediliyor..."
+                : "Tarih seçimi yapınız."}
             </div>
           )}
           {availableRooms.map((room) => (
@@ -327,14 +330,10 @@ function ReservationPage() {
             onChange={handleChange}
             required
             inputMode="tel"
-            pattern="^(\\+?90\\s?)?0?5\\d{2}\\s?\\d{3}\\s?\\d{2}\\s?\\d{2}$"
             placeholder="05XX XXX XX XX"
             className="rounded-lg border border-slate-200 px-3 py-2"
             data-testid="reservation-phone"
           />
-          <span className="text-xs text-slate-500">
-            Ornek: 0555 123 45 67 veya +90 555 123 45 67
-          </span>
         </label>
 
         <button
@@ -343,10 +342,13 @@ function ReservationPage() {
           disabled={isSubmitting || !selectedRoomId}
           data-testid="reservation-submit"
         >
-          {isSubmitting ? "Gonderiliyor..." : "Rezervasyonu Tamamla"}
+          {isSubmitting ? "Gönderiliyor..." : "Rezervasyonu Tamamla"}
         </button>
         {isSubmitting && (
-          <div className="text-sm text-slate-500" data-testid="reservation-loading">
+          <div
+            className="text-sm text-slate-500"
+            data-testid="reservation-loading"
+          >
             Rezervasyon talebiniz iletiliyor...
           </div>
         )}

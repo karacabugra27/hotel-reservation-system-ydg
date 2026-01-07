@@ -23,7 +23,7 @@ function ReservationSummary({ reservation }) {
           Oda Tipi: <strong>{roomTypeLabel(reservation.roomTypeName)}</strong>
         </p>
         <p>
-          Musteri: <strong>{reservation.customerName}</strong>
+          Müşteri: <strong>{reservation.customerName}</strong>
         </p>
         <p>
           Tarihler:{" "}
