@@ -56,8 +56,21 @@ public class ReservationServiceImpl implements ReservationService {
 
         Room room = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new IllegalStateException("Bu oda kaydı yok"));
-        Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new IllegalStateException("Bu müşteri kaydı yok"));
+
+        Customer customer;
+        if (dto.getCustomerId() != null) {
+            customer = customerRepository.findById(dto.getCustomerId())
+                    .orElseThrow(() -> new IllegalStateException("Bu müşteri kaydı yok"));
+        } else {
+            if (isBlank(dto.getFirstName()) || isBlank(dto.getLastName()) || isBlank(dto.getPhone())) {
+                throw new IllegalArgumentException("Müşteri bilgileri zorunludur.");
+            }
+            Customer newCustomer = new Customer();
+            newCustomer.setFirstName(dto.getFirstName().trim());
+            newCustomer.setLastName(dto.getLastName().trim());
+            newCustomer.setNumber(dto.getPhone().trim());
+            customer = customerRepository.save(newCustomer);
+        }
 
         Reservation reservation = new Reservation();
         reservation.setCustomer(customer);
@@ -168,6 +181,10 @@ public class ReservationServiceImpl implements ReservationService {
             response.setStatus(reservation.getReservationStatus().name());
         }
         return response;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private String generateReservationCode() {

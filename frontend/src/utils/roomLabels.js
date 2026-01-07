@@ -8,6 +8,8 @@ export const roomStatusLabel = (status) => {
       return "Temizlikte";
     case "MAINTENANCE":
       return "Bakımda";
+    case "OUT_OF_SERVICE":
+      return "Servis Dışı";
     default:
       return status || "Bilinmiyor";
   }

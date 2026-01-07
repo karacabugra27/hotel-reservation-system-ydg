@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  forwardRef,
+} from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
@@ -67,6 +73,27 @@ function ReservationPage() {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
+
+  const ReservationDayButton = useMemo(
+    () =>
+      forwardRef((props, ref) => {
+        const { day, date, ...buttonProps } = props;
+        const resolvedDate =
+          (day && day.date) || day || date || buttonProps?.value;
+        const testId =
+          resolvedDate instanceof Date
+            ? `day-${formatIsoDate(resolvedDate)}`
+            : undefined;
+        return (
+          <button
+            ref={ref}
+            {...buttonProps}
+            data-testid={testId}
+          />
+        );
+      }),
+    []
+  );
 
   const isBeforeToday = useCallback(
     (date) => {
@@ -353,12 +380,10 @@ function ReservationPage() {
         return;
       }
 
-      const defaultCustomerId = Number(
-        import.meta.env.VITE_DEFAULT_CUSTOMER_ID || 1
-      );
-
       const payload = {
-        customerId: defaultCustomerId,
+        firstName: formState.firstName,
+        lastName: formState.lastName,
+        phone: formState.phone,
         roomId: selectedRoomId,
         checkInDate: formState.checkInDate,
         checkOutDate: formState.checkOutDate,
@@ -533,6 +558,7 @@ function ReservationPage() {
             onSelect={handleRangeSelect}
             disabled={disabledDays}
             numberOfMonths={1}
+            components={{ DayButton: ReservationDayButton }}
           />
           <p className="mt-2 text-xs text-slate-500">
             Dolu günler seçilemez. Çıkış günü dolu olsa bile seçilebilir.

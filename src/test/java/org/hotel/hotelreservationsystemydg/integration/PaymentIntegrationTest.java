@@ -107,6 +107,7 @@ class PaymentIntegrationTest {
         reservation.setRoom(room);
         reservation.setCheckIn(LocalDate.now().plusDays(1));
         reservation.setCheckOut(LocalDate.now().plusDays(2));
+        reservation.setReservationCode("123456");
         reservation.setReservationStatus(ReservationStatus.CREATED);
         return reservationRepository.save(reservation);
     }

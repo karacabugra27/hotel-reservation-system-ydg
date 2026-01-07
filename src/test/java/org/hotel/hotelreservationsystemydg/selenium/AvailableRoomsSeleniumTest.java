@@ -95,10 +95,15 @@ public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
         String checkInValue = checkIn.format(DateTimeFormatter.ISO_LOCAL_DATE);
         String checkOutValue = checkOut.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-        driver.findElement(By.cssSelector("[data-testid='reservation-checkin']"))
-                .sendKeys(checkInValue);
-        driver.findElement(By.cssSelector("[data-testid='reservation-checkout']"))
-                .sendKeys(checkOutValue);
+        WebElement checkInButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("[data-testid='day-" + checkInValue + "']")));
+        checkInButton.click();
+
+        WebElement checkOutButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("[data-testid='day-" + checkOutValue + "']")));
+        checkOutButton.click();
 
         driver.findElement(By.cssSelector("[data-testid='reservation-submit']")).click();
 
@@ -116,5 +121,28 @@ public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("[data-testid='reservation-summary']")));
         assertTrue(summaryCard.isDisplayed(), "Rezervasyon ozeti gorunmeli");
+
+        WebElement reservationCode = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("[data-testid='reservation-code']")));
+        String reservationCodeValue = reservationCode.getText();
+        assertFalse(reservationCodeValue.isBlank(), "Rezervasyon kodu bos olmamali");
+
+        WebElement lookupButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("[data-testid='go-to-reservation-lookup']")));
+        lookupButton.click();
+
+        WebElement lookupInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("[data-testid='reservation-lookup-input']")));
+        lookupInput.sendKeys(reservationCodeValue.replaceAll("\\s", ""));
+
+        driver.findElement(By.cssSelector("[data-testid='reservation-lookup-submit']")).click();
+
+        WebElement lookupSummary = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("[data-testid='reservation-summary']")));
+        assertTrue(lookupSummary.isDisplayed(), "Sorgu sonucu gorunmeli");
     }
 }

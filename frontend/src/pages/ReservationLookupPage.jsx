@@ -18,7 +18,7 @@ function ReservationLookupPage() {
       return;
     }
 
-    if (!/^[0-9]{5,6}$/.test(trimmedCode)) {
+    if (!/^[0-9]{6}$/.test(trimmedCode)) {
       setErrorMessage("Rezervasyon kodu 6 haneli olmalı.");
       return;
     }

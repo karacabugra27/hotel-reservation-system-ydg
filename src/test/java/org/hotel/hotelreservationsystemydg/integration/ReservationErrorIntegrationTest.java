@@ -95,6 +95,28 @@ class ReservationErrorIntegrationTest {
                 .andExpect(jsonPath("$.error").value("reservasyon bulunamadı"));
     }
 
+    @Test
+    void musteriBilgileriEksikseBadRequestDoner() throws Exception {
+        Room room = roomRepository.findAll().get(0);
+        LocalDate checkIn = LocalDate.now().plusDays(2);
+        LocalDate checkOut = checkIn.plusDays(2);
+
+        String requestBody = """
+                {
+                  "firstName": "Eksik",
+                  "roomId": %d,
+                  "checkInDate": "%s",
+                  "checkOutDate": "%s"
+                }
+                """.formatted(room.getId(), checkIn, checkOut);
+
+        mockMvc.perform(post("/reservations/createReservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Müşteri bilgileri zorunludur."));
+    }
+
     private Customer createCustomer(String firstName, String lastName) {
         Customer customer = new Customer();
         customer.setFirstName(firstName);

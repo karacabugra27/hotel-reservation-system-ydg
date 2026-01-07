@@ -13,8 +13,13 @@ public class ReservationRequestDto {
     //! request --> check-in
     //! request --> check-out
 
-    @NotNull(message = "customer id zorunlu")
     private Long customerId;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String phone;
 
     @NotNull
     private Long roomId;
@@ -33,6 +38,30 @@ public class ReservationRequestDto {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Long getRoomId() {

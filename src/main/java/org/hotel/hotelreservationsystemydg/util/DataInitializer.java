@@ -57,12 +57,34 @@ public class DataInitializer implements CommandLineRunner {
             doubleRoom.setCapacity(2);
             doubleRoom.setBasePrice(BigDecimal.valueOf(180));
 
+            RoomType twin = new RoomType();
+            twin.setName("Twin");
+            twin.setCapacity(2);
+            twin.setBasePrice(BigDecimal.valueOf(200));
+
+            RoomType family = new RoomType();
+            family.setName("Family");
+            family.setCapacity(4);
+            family.setBasePrice(BigDecimal.valueOf(320));
+
+            RoomType deluxe = new RoomType();
+            deluxe.setName("Deluxe");
+            deluxe.setCapacity(3);
+            deluxe.setBasePrice(BigDecimal.valueOf(420));
+
             roomTypeRepository.save(single);
             roomTypeRepository.save(doubleRoom);
+            roomTypeRepository.save(twin);
+            roomTypeRepository.save(family);
+            roomTypeRepository.save(deluxe);
         }
 
         if (roomRepository.count() == 0) {
-            RoomType single = roomTypeRepository.findAll().get(0);
+            RoomType single = roomTypeRepository.findByName("Single").orElseThrow();
+            RoomType doubleRoom = roomTypeRepository.findByName("Double").orElseThrow();
+            RoomType twin = roomTypeRepository.findByName("Twin").orElseThrow();
+            RoomType family = roomTypeRepository.findByName("Family").orElseThrow();
+            RoomType deluxe = roomTypeRepository.findByName("Deluxe").orElseThrow();
 
             Room room101 = new Room();
             room101.setRoomNumber("101");
@@ -74,8 +96,38 @@ public class DataInitializer implements CommandLineRunner {
             room102.setRoomType(single);
             room102.setRoomStatus(RoomStatus.AVAILABLE);
 
+            Room room201 = new Room();
+            room201.setRoomNumber("201");
+            room201.setRoomType(doubleRoom);
+            room201.setRoomStatus(RoomStatus.AVAILABLE);
+
+            Room room202 = new Room();
+            room202.setRoomNumber("202");
+            room202.setRoomType(doubleRoom);
+            room202.setRoomStatus(RoomStatus.OCCUPIED);
+
+            Room room301 = new Room();
+            room301.setRoomNumber("301");
+            room301.setRoomType(twin);
+            room301.setRoomStatus(RoomStatus.AVAILABLE);
+
+            Room room401 = new Room();
+            room401.setRoomNumber("401");
+            room401.setRoomType(family);
+            room401.setRoomStatus(RoomStatus.AVAILABLE);
+
+            Room room501 = new Room();
+            room501.setRoomNumber("501");
+            room501.setRoomType(deluxe);
+            room501.setRoomStatus(RoomStatus.AVAILABLE);
+
             roomRepository.save(room101);
             roomRepository.save(room102);
+            roomRepository.save(room201);
+            roomRepository.save(room202);
+            roomRepository.save(room301);
+            roomRepository.save(room401);
+            roomRepository.save(room501);
         }
 
         if (customerRepository.count() == 0) {
@@ -84,6 +136,18 @@ public class DataInitializer implements CommandLineRunner {
             demo.setLastName("Student");
             demo.setNumber("5551234567");
             customerRepository.save(demo);
+
+            Customer testUser = new Customer();
+            testUser.setFirstName("Test");
+            testUser.setLastName("User");
+            testUser.setNumber("5552345678");
+            customerRepository.save(testUser);
+
+            Customer guest = new Customer();
+            guest.setFirstName("Guest");
+            guest.setLastName("Sample");
+            guest.setNumber("5553456789");
+            customerRepository.save(guest);
         }
     }
 }

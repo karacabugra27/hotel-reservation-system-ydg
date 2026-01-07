@@ -42,6 +42,12 @@ public class SeleniumDataInitializer {
         standard.setBasePrice(BigDecimal.valueOf(1000));
         roomTypeRepository.save(standard);
 
+        RoomType deluxe = new RoomType();
+        deluxe.setName("DELUXE");
+        deluxe.setCapacity(3);
+        deluxe.setBasePrice(BigDecimal.valueOf(1600));
+        roomTypeRepository.save(deluxe);
+
         Room availableRoom = new Room();
         availableRoom.setRoomNumber("101");
         availableRoom.setRoomType(standard);
@@ -54,12 +60,24 @@ public class SeleniumDataInitializer {
         occupiedRoom.setRoomStatus(RoomStatus.OCCUPIED);
         roomRepository.save(occupiedRoom);
 
+        Room availableRoomDeluxe = new Room();
+        availableRoomDeluxe.setRoomNumber("201");
+        availableRoomDeluxe.setRoomType(deluxe);
+        availableRoomDeluxe.setRoomStatus(RoomStatus.AVAILABLE);
+        roomRepository.save(availableRoomDeluxe);
+
         if (customerRepository.count() == 0) {
             Customer demo = new Customer();
             demo.setFirstName("Selenium");
             demo.setLastName("Student");
             demo.setNumber("5550000000");
             customerRepository.save(demo);
+
+            Customer testUser = new Customer();
+            testUser.setFirstName("Selenium");
+            testUser.setLastName("User");
+            testUser.setNumber("5551111111");
+            customerRepository.save(testUser);
         }
     }
 }

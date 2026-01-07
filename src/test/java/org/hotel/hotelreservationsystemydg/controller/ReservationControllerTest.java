@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.controller;
 
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.ReservationDateRangeDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.service.ReservationService;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -92,5 +94,20 @@ class ReservationControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assertSame(responseDto, response.getBody());
         verify(reservationService).getReservationByCode("654321");
+    }
+
+    @Test
+    void odayaGoreRezervasyonTarihleriServiseDelegasyonYapmali() {
+        List<ReservationDateRangeDto> ranges = List.of(new ReservationDateRangeDto());
+
+        when(reservationService.getReservationsByRoomId(1L))
+                .thenReturn(ranges);
+
+        ResponseEntity<List<ReservationDateRangeDto>> response =
+                reservationController.getReservationsByRoomId(1L);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertSame(ranges, response.getBody());
+        verify(reservationService).getReservationsByRoomId(1L);
     }
 }

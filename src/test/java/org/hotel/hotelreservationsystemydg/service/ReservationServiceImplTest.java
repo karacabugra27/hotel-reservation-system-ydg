@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.service;
 
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.ReservationDateRangeDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.enums.PaymentStatus;
@@ -19,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -156,6 +158,72 @@ public class ReservationServiceImplTest {
     }
 
     @Test
+    void musteriBilgileriEksikseHataVermeli() {
+        ReservationRequestDto dto = createValidReservationRequest();
+        dto.setCustomerId(null);
+        dto.setFirstName(null);
+        dto.setLastName("Soyad");
+        dto.setPhone("5551231234");
+
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
+                anyLong(), any(), any()
+        )).thenReturn(false);
+        when(roomRepository.findById(dto.getRoomId()))
+                .thenReturn(Optional.of(new Room()));
+
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,
+                        () -> reservationService.createReservation(dto));
+
+        assertEquals("Müşteri bilgileri zorunludur.", exception.getMessage());
+        verify(customerRepository, never()).save(any());
+    }
+
+    @Test
+    void musteriBilgileriIleRezervasyonOlusturulabilir() {
+        ReservationRequestDto dto = createValidReservationRequest();
+        dto.setCustomerId(null);
+        dto.setFirstName("Test");
+        dto.setLastName("User");
+        dto.setPhone("5551231234");
+
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
+                anyLong(), any(), any()
+        )).thenReturn(false);
+        when(roomRepository.findById(dto.getRoomId()))
+                .thenReturn(Optional.of(new Room()));
+        when(customerRepository.save(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        ReservationResponseDto response = reservationService.createReservation(dto);
+
+        assertNotNull(response);
+        verify(customerRepository).save(any());
+        verify(reservationRepository).save(any());
+    }
+
+    @Test
+    void musteriIdVarkenYeniMusteriOlusturulmamali() {
+        ReservationRequestDto dto = createValidReservationRequest();
+        dto.setCustomerId(5L);
+
+        when(reservationRepository.existsByRoomIdAndCheckOutAfterAndCheckInBefore(
+                anyLong(), any(), any()
+        )).thenReturn(false);
+        when(roomRepository.findById(dto.getRoomId()))
+                .thenReturn(Optional.of(new Room()));
+        when(customerRepository.findById(dto.getCustomerId()))
+                .thenReturn(Optional.of(new Customer()));
+        when(reservationRepository.save(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        reservationService.createReservation(dto);
+
+        verify(customerRepository, never()).save(any());
+        verify(reservationRepository).save(any());
+    }
+
+    @Test
     void rezervasyonKoduIleSorguBasarili() {
         Reservation reservation = new Reservation();
         reservation.setReservationCode("123456");
@@ -167,6 +235,39 @@ public class ReservationServiceImplTest {
 
         assertNotNull(response);
         assertEquals("123456", response.getReservationCode());
+    }
+
+    @Test
+    void rezervasyonKoduBulunamazsaHataVermeli() {
+        when(reservationRepository.findByReservationCode("000000"))
+                .thenReturn(Optional.empty());
+
+        IllegalArgumentException exception =
+                assertThrows(IllegalArgumentException.class,
+                        () -> reservationService.getReservationByCode("000000"));
+
+        assertEquals("Rezervasyon kodu bulunamadı.", exception.getMessage());
+    }
+
+    @Test
+    void iptalEdilenRezervasyonlarDoluTarihListesineGirmemeli() {
+        Reservation cancelled = new Reservation();
+        cancelled.setReservationStatus(ReservationStatus.CANCELLED);
+
+        Reservation active = new Reservation();
+        active.setReservationStatus(ReservationStatus.CREATED);
+        active.setCheckIn(LocalDate.now().plusDays(1));
+        active.setCheckOut(LocalDate.now().plusDays(2));
+
+        when(reservationRepository.findByRoom_Id(1L))
+                .thenReturn(List.of(cancelled, active));
+
+        List<ReservationDateRangeDto> response =
+                reservationService.getReservationsByRoomId(1L);
+
+        assertEquals(1, response.size());
+        assertEquals(active.getCheckIn(), response.get(0).getCheckInDate());
+        assertEquals(active.getCheckOut(), response.get(0).getCheckOutDate());
     }
 
     //t ödeme yapılmadan check-in
