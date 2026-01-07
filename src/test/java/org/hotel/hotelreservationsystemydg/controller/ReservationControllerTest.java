@@ -77,4 +77,20 @@ class ReservationControllerTest {
         assertEquals(200, response.getStatusCode().value());
         verify(reservationService).checkOut(dto);
     }
+
+    @Test
+    void rezervasyonKoduIleSorguServiseDelegasyonYapmali() {
+        ReservationResponseDto responseDto = new ReservationResponseDto();
+        responseDto.setReservationCode("654321");
+
+        when(reservationService.getReservationByCode("654321"))
+                .thenReturn(responseDto);
+
+        ResponseEntity<ReservationResponseDto> response =
+                reservationController.getReservationByCode("654321");
+
+        assertEquals(200, response.getStatusCode().value());
+        assertSame(responseDto, response.getBody());
+        verify(reservationService).getReservationByCode("654321");
+    }
 }

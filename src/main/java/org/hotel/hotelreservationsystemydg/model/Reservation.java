@@ -22,6 +22,9 @@ public class Reservation {
     private LocalDate checkIn;
     private LocalDate checkOut;
 
+    @Column(unique = true, nullable = false)
+    private String reservationCode;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
@@ -71,5 +74,13 @@ public class Reservation {
 
     public void setReservationStatus(ReservationStatus reservationStatus) {
         this.reservationStatus = reservationStatus;
+    }
+
+    public String getReservationCode() {
+        return reservationCode;
+    }
+
+    public void setReservationCode(String reservationCode) {
+        this.reservationCode = reservationCode;
     }
 }

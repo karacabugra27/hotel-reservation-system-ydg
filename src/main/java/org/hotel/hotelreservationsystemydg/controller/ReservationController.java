@@ -3,6 +3,7 @@ package org.hotel.hotelreservationsystemydg.controller;
 import jakarta.validation.Valid;
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.ReservationDateRangeDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.service.ReservationService;
@@ -48,6 +49,16 @@ public class ReservationController {
     @GetMapping
     ResponseEntity<List<ReservationResponseDto>> getReservations() {
         return ResponseEntity.ok(reservationService.getReservations());
+    }
+
+    @GetMapping("/room/{roomId}")
+    ResponseEntity<List<ReservationDateRangeDto>> getReservationsByRoomId(@PathVariable Long roomId) {
+        return ResponseEntity.ok(reservationService.getReservationsByRoomId(roomId));
+    }
+
+    @GetMapping("/code/{reservationCode}")
+    ResponseEntity<ReservationResponseDto> getReservationByCode(@PathVariable String reservationCode) {
+        return ResponseEntity.ok(reservationService.getReservationByCode(reservationCode));
     }
 
     @PostMapping("/cancel/{reservationId}")

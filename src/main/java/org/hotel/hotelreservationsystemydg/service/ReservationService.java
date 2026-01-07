@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.service;
 
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.ReservationDateRangeDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 
@@ -16,6 +17,10 @@ public interface ReservationService {
     void checkOut(CheckOutRequestDto request);
 
     List<ReservationResponseDto> getReservations();
+
+    List<ReservationDateRangeDto> getReservationsByRoomId(Long roomId);
+
+    ReservationResponseDto getReservationByCode(String reservationCode);
 
     ReservationResponseDto cancelReservation(Long reservationId);
 

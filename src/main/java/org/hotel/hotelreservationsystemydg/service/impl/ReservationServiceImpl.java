@@ -2,6 +2,7 @@ package org.hotel.hotelreservationsystemydg.service.impl;
 
 import org.hotel.hotelreservationsystemydg.dto.CheckInRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.CheckOutRequestDto;
+import org.hotel.hotelreservationsystemydg.dto.ReservationDateRangeDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationRequestDto;
 import org.hotel.hotelreservationsystemydg.dto.ReservationResponseDto;
 import org.hotel.hotelreservationsystemydg.enums.PaymentStatus;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.security.SecureRandom;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -27,6 +29,9 @@ public class ReservationServiceImpl implements ReservationService {
     private final RoomRepository roomRepository;
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
+    private final SecureRandom random = new SecureRandom();
+    private static final int RESERVATION_CODE_LENGTH = 6;
+    private static final int RESERVATION_CODE_ATTEMPTS = 10;
 
 
     public ReservationServiceImpl(ReservationRepository reservationRepository, RoomRepository roomRepository, CustomerRepository customerRepository, PaymentRepository paymentRepository) {
@@ -59,6 +64,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setRoom(room);
         reservation.setCheckIn(dto.getCheckInDate());
         reservation.setCheckOut(dto.getCheckOutDate());
+        reservation.setReservationCode(generateReservationCode());
         reservation.setReservationStatus(ReservationStatus.CREATED);
 
         reservationRepository.save(reservation);
@@ -102,6 +108,24 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ReservationDateRangeDto> getReservationsByRoomId(Long roomId) {
+        return reservationRepository.findByRoom_Id(roomId)
+                .stream()
+                .filter(reservation -> reservation.getReservationStatus() != ReservationStatus.CANCELLED)
+                .map(this::mapToDateRangeResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReservationResponseDto getReservationByCode(String reservationCode) {
+        Reservation reservation = reservationRepository.findByReservationCode(reservationCode)
+                .orElseThrow(() -> new IllegalArgumentException("Rezervasyon kodu bulunamadı."));
+        return mapToResponse(reservation);
+    }
+
+    @Override
     @Transactional
     public ReservationResponseDto cancelReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
@@ -129,9 +153,31 @@ public class ReservationServiceImpl implements ReservationService {
                 response.setRoomTypeName(reservation.getRoom().getRoomType().getName());
             }
         }
+        response.setReservationCode(reservation.getReservationCode());
         if (reservation.getReservationStatus() != null) {
             response.setStatus(reservation.getReservationStatus().name());
         }
         return response;
+    }
+
+    private ReservationDateRangeDto mapToDateRangeResponse(Reservation reservation) {
+        ReservationDateRangeDto response = new ReservationDateRangeDto();
+        response.setCheckInDate(reservation.getCheckIn());
+        response.setCheckOutDate(reservation.getCheckOut());
+        if (reservation.getReservationStatus() != null) {
+            response.setStatus(reservation.getReservationStatus().name());
+        }
+        return response;
+    }
+
+    private String generateReservationCode() {
+        for (int attempt = 0; attempt < RESERVATION_CODE_ATTEMPTS; attempt++) {
+            int value = random.nextInt((int) Math.pow(10, RESERVATION_CODE_LENGTH));
+            String code = String.format("%0" + RESERVATION_CODE_LENGTH + "d", value);
+            if (!reservationRepository.existsByReservationCode(code)) {
+                return code;
+            }
+        }
+        throw new IllegalStateException("Rezervasyon kodu oluşturulamadı.");
     }
 }

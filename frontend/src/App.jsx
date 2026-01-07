@@ -3,7 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import RoomDetailPage from "./pages/RoomDetailPage";
 import RoomsPage from "./pages/RoomsPage";
-import ReservationListPage from "./pages/ReservationListPage";
+import ReservationLookupPage from "./pages/ReservationLookupPage";
 import ReservationPage from "./pages/ReservationPage";
 import ReservationResultPage from "./pages/ReservationResultPage";
 
@@ -34,11 +34,11 @@ function App() {
               Odalar
             </Link>
             <Link
-              to="/reservations"
+              to="/reservation-lookup"
               className="text-sm font-medium text-slate-700 hover:text-indigo-700"
-              data-testid="nav-reservations"
+              data-testid="nav-reservation-lookup"
             >
-              Rezervasyon Kayıtları
+              Rezervasyon Sorgula
             </Link>
             <Link
               to="/reserve"
@@ -58,7 +58,7 @@ function App() {
           <Route path="/rooms/:id" element={<RoomDetailPage />} />
           <Route path="/reserve" element={<ReservationPage />} />
           <Route path="/reserve/result" element={<ReservationResultPage />} />
-          <Route path="/reservations" element={<ReservationListPage />} />
+          <Route path="/reservation-lookup" element={<ReservationLookupPage />} />
         </Routes>
       </main>
     </div>

@@ -18,6 +18,7 @@ public class ReservationResponseDto {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private String status;
+    private String reservationCode;
 
     public Long getReservationId() {
         return reservationId;
@@ -73,5 +74,13 @@ public class ReservationResponseDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getReservationCode() {
+        return reservationCode;
+    }
+
+    public void setReservationCode(String reservationCode) {
+        this.reservationCode = reservationCode;
     }
 }

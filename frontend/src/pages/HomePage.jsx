@@ -34,8 +34,8 @@ function HomePage() {
             </Link>
             <Link
               className="inline-flex items-center justify-center rounded-lg border border-white/40 px-6 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-              to="/reservations"
-              data-testid="home-reservations-button"
+              to="/reservation-lookup"
+              data-testid="home-reservation-lookup-button"
             >
               Rezervasyon Sorgula
             </Link>

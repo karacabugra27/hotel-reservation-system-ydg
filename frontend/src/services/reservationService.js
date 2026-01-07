@@ -4,10 +4,10 @@ export const createReservation = (payload) => {
   return api.post("/reservations/createReservation", payload);
 };
 
-export const getReservations = () => {
-  return api.get("/reservations");
+export const getReservationsByRoomId = (roomId) => {
+  return api.get(`/reservations/room/${roomId}`);
 };
 
-export const cancelReservation = (reservationId) => {
-  return api.post(`/reservations/cancel/${reservationId}`);
+export const getReservationByCode = (reservationCode) => {
+  return api.get(`/reservations/code/${reservationCode}`);
 };

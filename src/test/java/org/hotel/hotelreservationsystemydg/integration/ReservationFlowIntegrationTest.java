@@ -30,6 +30,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,9 +79,31 @@ class ReservationFlowIntegrationTest {
                         .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.reservationId").isNumber())
+                .andExpect(jsonPath("$.reservationCode").isString())
                 .andExpect(jsonPath("$.customerName").value("Ali Veli"))
                 .andExpect(jsonPath("$.roomNumber").value(room.getRoomNumber()))
                 .andExpect(jsonPath("$.status").value("CREATED"));
+    }
+
+    @Test
+    void rezervasyonKoduIleSorguBasarili() throws Exception {
+        Customer customer = createCustomer("Ayse", "Kara");
+        Room room = roomRepository.findAll().get(0);
+
+        String requestJson = buildReservationRequestJson(customer.getId(), room.getId());
+
+        mockMvc.perform(post("/reservations/createReservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk());
+
+        Reservation reservation = reservationRepository.findAll().get(0);
+        String reservationCode = reservation.getReservationCode();
+
+        mockMvc.perform(get("/reservations/code/{code}", reservationCode))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reservationCode").value(reservationCode))
+                .andExpect(jsonPath("$.customerName").value("Ayse Kara"));
     }
 
     @Test

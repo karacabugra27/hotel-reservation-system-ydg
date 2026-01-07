@@ -1,6 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { createReservation } from "../services/reservationService";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+import {
+  createReservation,
+  getReservationsByRoomId,
+} from "../services/reservationService";
 import { getAvailableRoomsByDates } from "../services/roomService";
 import { roomStatusLabel, roomTypeLabel } from "../utils/roomLabels";
 
@@ -18,6 +23,8 @@ function ReservationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [availableRooms, setAvailableRooms] = useState([]);
+  const [reservedRanges, setReservedRanges] = useState([]);
+  const [reservedRangesError, setReservedRangesError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -29,22 +36,268 @@ function ReservationPage() {
   }, [location.state, searchParams]);
 
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
-  const selectedRoom = availableRooms.find(
-    (room) => room.id === selectedRoomId
-  );
 
   useEffect(() => {
     setSelectedRoomId(initialRoomId);
   }, [initialRoomId]);
 
+  const parseIsoDate = (value) => {
+    if (!value) {
+      return undefined;
+    }
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) {
+      return undefined;
+    }
+    return new Date(year, month - 1, day);
+  };
+
+  const today = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }, []);
+
+  const formatIsoDate = (date) => {
+    if (!date) {
+      return "";
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const isBeforeToday = useCallback(
+    (date) => {
+      if (!date) {
+        return false;
+      }
+      const normalized = new Date(date);
+      normalized.setHours(0, 0, 0, 0);
+      return normalized < today;
+    },
+    [today]
+  );
+
+  const selectedRange = useMemo(
+    () => ({
+      from: parseIsoDate(formState.checkInDate),
+      to: parseIsoDate(formState.checkOutDate),
+    }),
+    [formState.checkInDate, formState.checkOutDate]
+  );
+
+  const disabledDays = useMemo(() => {
+    const blockedRanges = reservedRanges
+      .map((range) => {
+        const from = parseIsoDate(range.checkInDate);
+        const checkOut = parseIsoDate(range.checkOutDate);
+        if (!from || !checkOut) {
+          return null;
+        }
+        const to = new Date(
+          checkOut.getFullYear(),
+          checkOut.getMonth(),
+          checkOut.getDate() - 1
+        );
+        if (to < from) {
+          return null;
+        }
+        return { from, to };
+      })
+      .filter(Boolean);
+
+    return [{ before: today }, ...blockedRanges];
+  }, [reservedRanges, today]);
+
+  const isCheckInBlocked = useCallback(
+    (dateValue) =>
+      reservedRanges.some(
+        (range) =>
+          dateValue >= range.checkInDate && dateValue < range.checkOutDate
+      ),
+    [reservedRanges]
+  );
+
+  const isRangeOverlapping = useCallback(
+    (checkIn, checkOut) =>
+      reservedRanges.some(
+        (range) => range.checkOutDate > checkIn && range.checkInDate < checkOut
+      ),
+    [reservedRanges]
+  );
+
+  useEffect(() => {
+    if (!selectedRoomId) {
+      setReservedRanges([]);
+      return;
+    }
+
+    let active = true;
+    setReservedRangesError("");
+    setReservedRanges([]);
+
+    getReservationsByRoomId(selectedRoomId)
+      .then((response) => {
+        if (!active) {
+          return;
+        }
+        setReservedRanges(response.data || []);
+      })
+      .catch(() => {
+        if (active) {
+          setReservedRangesError("Dolu tarihler yüklenemedi.");
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedRoomId]);
+
+  useEffect(() => {
+    if (reservedRanges.length === 0) {
+      return;
+    }
+
+    if (formState.checkInDate && isCheckInBlocked(formState.checkInDate)) {
+      setFormState((prev) => ({
+        ...prev,
+        checkInDate: "",
+        checkOutDate: "",
+      }));
+      setErrorMessage(
+        "Seçili oda için giriş tarihi dolu. Lütfen başka tarih seçin."
+      );
+      return;
+    }
+
+    if (
+      formState.checkInDate &&
+      formState.checkOutDate &&
+      isRangeOverlapping(formState.checkInDate, formState.checkOutDate)
+    ) {
+      setFormState((prev) => ({ ...prev, checkOutDate: "" }));
+      setErrorMessage(
+        "Seçili oda için tarihler dolu aralıkla çakışıyor. Çıkış tarihini tekrar seçin."
+      );
+    }
+  }, [
+    formState.checkInDate,
+    formState.checkOutDate,
+    isCheckInBlocked,
+    isRangeOverlapping,
+    reservedRanges.length,
+  ]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormState((prev) => ({ ...prev, [name]: value }));
     if (name === "checkInDate" || name === "checkOutDate") {
       setAvailabilityMessage("");
       setAvailabilityStatus("info");
+      setErrorMessage("");
     }
+
+    if (name === "checkInDate" && value) {
+      if (isCheckInBlocked(value)) {
+        setErrorMessage("Seçilen giriş tarihi dolu. Lütfen başka tarih seçin.");
+        return;
+      }
+
+      if (
+        formState.checkOutDate &&
+        isRangeOverlapping(value, formState.checkOutDate)
+      ) {
+        setFormState((prev) => ({
+          ...prev,
+          checkInDate: value,
+          checkOutDate: "",
+        }));
+        setErrorMessage(
+          "Seçilen giriş tarihi dolu aralıkla çakışıyor. Çıkış tarihini tekrar seçin."
+        );
+        return;
+      }
+    }
+
+    if (name === "checkOutDate" && value && formState.checkInDate) {
+      if (isRangeOverlapping(formState.checkInDate, value)) {
+        setErrorMessage("Seçilen çıkış tarihi dolu aralıkla çakışıyor.");
+        return;
+      }
+    }
+
+    setFormState((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleRangeSelect = useCallback(
+    (range) => {
+      if (!range) {
+        setFormState((prev) => ({
+          ...prev,
+          checkInDate: "",
+          checkOutDate: "",
+        }));
+        return;
+      }
+
+      const checkInValue = range.from ? formatIsoDate(range.from) : "";
+      const checkOutValue = range.to ? formatIsoDate(range.to) : "";
+
+      if (range.from && isBeforeToday(range.from)) {
+        setErrorMessage("Geçmiş tarih seçilemez.");
+        setFormState((prev) => ({
+          ...prev,
+          checkInDate: "",
+          checkOutDate: "",
+        }));
+        return;
+      }
+
+      if (range.to && isBeforeToday(range.to)) {
+        setErrorMessage("Geçmiş tarih seçilemez.");
+        setFormState((prev) => ({
+          ...prev,
+          checkInDate: "",
+          checkOutDate: "",
+        }));
+        return;
+      }
+
+      if (checkInValue && isCheckInBlocked(checkInValue)) {
+        setErrorMessage("Seçilen giriş tarihi dolu. Lütfen başka tarih seçin.");
+        setFormState((prev) => ({
+          ...prev,
+          checkInDate: "",
+          checkOutDate: "",
+        }));
+        return;
+      }
+
+      if (checkInValue && checkOutValue) {
+        if (isRangeOverlapping(checkInValue, checkOutValue)) {
+          setErrorMessage("Seçilen tarihler dolu aralıkla çakışıyor.");
+          setFormState((prev) => ({
+            ...prev,
+            checkInDate: checkInValue,
+            checkOutDate: "",
+          }));
+          return;
+        }
+      }
+
+      setErrorMessage("");
+      setAvailabilityMessage("");
+      setAvailabilityStatus("info");
+      setFormState((prev) => ({
+        ...prev,
+        checkInDate: checkInValue,
+        checkOutDate: checkOutValue,
+      }));
+    },
+    [isCheckInBlocked, isRangeOverlapping, isBeforeToday]
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -53,7 +306,7 @@ function ReservationPage() {
     setAvailabilityStatus("info");
 
     if (!formState.checkInDate || !formState.checkOutDate) {
-      setErrorMessage("Lütgen giriş ve çıkış tarihlerini girin.");
+      setErrorMessage("Lütfen giriş ve çıkış tarihlerini seçin.");
       return;
     }
 
@@ -64,8 +317,15 @@ function ReservationPage() {
       return;
     }
 
+    const checkInDateValue = parseIsoDate(formState.checkInDate);
+    const checkOutDateValue = parseIsoDate(formState.checkOutDate);
+    if (isBeforeToday(checkInDateValue) || isBeforeToday(checkOutDateValue)) {
+      setErrorMessage("Bugünden önceki tarihler seçilemez.");
+      return;
+    }
+
     if (formState.checkOutDate <= formState.checkInDate) {
-      setErrorMessage("Çıkış tarihi giris tarihinden sonra olmalı.");
+      setErrorMessage("Çıkış tarihi giriş tarihinden sonra olmalı.");
       return;
     }
 
@@ -125,14 +385,15 @@ function ReservationPage() {
 
     if (!checkInDate || !checkOutDate) {
       setAvailableRooms([]);
+      setAvailabilityMessage("Tarih seçimi yapınız.");
+      setAvailabilityStatus("info");
       return;
     }
 
     if (checkOutDate <= checkInDate) {
       setAvailableRooms([]);
-      setAvailabilityMessage("");
-      setAvailabilityStatus("info");
-      setErrorMessage("Çıkış tarihi giriş tarihinden sonra olmalı.");
+      setAvailabilityMessage("Çıkış tarihi giriş tarihinden sonra olmalı.");
+      setAvailabilityStatus("warning");
       return;
     }
 
@@ -172,7 +433,8 @@ function ReservationPage() {
       })
       .catch(() => {
         if (active) {
-          setErrorMessage("Müsait odalar yüklenemedi.");
+          setAvailabilityMessage("Müsait odalar yüklenemedi.");
+          setAvailabilityStatus("warning");
         }
       })
       .finally(() => {
@@ -226,6 +488,12 @@ function ReservationPage() {
         </div>
       )}
 
+      {reservedRangesError && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          {reservedRangesError}
+        </div>
+      )}
+
       <form
         className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
         onSubmit={handleSubmit}
@@ -235,11 +503,11 @@ function ReservationPage() {
           <label className="grid gap-2 text-sm text-slate-700">
             <span className="font-semibold text-slate-900">Giriş Tarihi</span>
             <input
-              type="date"
+              type="text"
               name="checkInDate"
               value={formState.checkInDate}
-              onChange={handleChange}
-              required
+              readOnly
+              placeholder="Tarih seçin"
               className="rounded-lg border border-slate-200 px-3 py-2"
               data-testid="reservation-checkin"
             />
@@ -247,25 +515,31 @@ function ReservationPage() {
           <label className="grid gap-2 text-sm text-slate-700">
             <span className="font-semibold text-slate-900">Çıkış Tarihi</span>
             <input
-              type="date"
+              type="text"
               name="checkOutDate"
               value={formState.checkOutDate}
-              onChange={handleChange}
-              required
+              readOnly
+              placeholder="Tarih seçin"
               className="rounded-lg border border-slate-200 px-3 py-2"
               data-testid="reservation-checkout"
             />
           </label>
         </div>
 
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <DayPicker
+            mode="range"
+            selected={selectedRange}
+            onSelect={handleRangeSelect}
+            disabled={disabledDays}
+            numberOfMonths={1}
+          />
+          <p className="mt-2 text-xs text-slate-500">
+            Dolu günler seçilemez. Çıkış günü dolu olsa bile seçilebilir.
+          </p>
+        </div>
+
         <div className="grid gap-3" data-testid="reservation-room-options">
-          {availableRooms.length === 0 && (
-            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              {isChecking
-                ? "Müsait odalar kontrol ediliyor..."
-                : "Tarih seçimi yapınız."}
-            </div>
-          )}
           {availableRooms.map((room) => (
             <label
               key={room.id}

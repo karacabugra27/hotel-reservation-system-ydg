@@ -16,4 +16,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByCustomerId(Long customerId);
 
+    List<Reservation> findByRoom_Id(Long roomId);
+
+    boolean existsByReservationCode(String reservationCode);
+
+    java.util.Optional<Reservation> findByReservationCode(String reservationCode);
+
 }

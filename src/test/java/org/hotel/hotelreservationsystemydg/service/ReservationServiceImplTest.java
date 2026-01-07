@@ -150,8 +150,23 @@ public class ReservationServiceImplTest {
         assertNotNull(response);
         assertEquals("101", response.getRoomNumber());
         assertEquals("CREATED", response.getStatus());
+        assertNotNull(response.getReservationCode());
 
         verify(reservationRepository).save(any());
+    }
+
+    @Test
+    void rezervasyonKoduIleSorguBasarili() {
+        Reservation reservation = new Reservation();
+        reservation.setReservationCode("123456");
+
+        when(reservationRepository.findByReservationCode("123456"))
+                .thenReturn(Optional.of(reservation));
+
+        ReservationResponseDto response = reservationService.getReservationByCode("123456");
+
+        assertNotNull(response);
+        assertEquals("123456", response.getReservationCode());
     }
 
     //t ödeme yapılmadan check-in
