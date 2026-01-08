@@ -59,6 +59,20 @@ stage('0- Docker Check') {
             }
         }
 
+        stage('4.5- Coverage Report') {
+            steps {
+                sh './mvnw -DskipTests -DskipITs jacoco:report'
+            }
+            post {
+                always {
+                    jacoco execPattern: '**/target/jacoco.exec',
+                           classPattern: '**/target/classes',
+                           sourcePattern: '**/src/main/java'
+                    archiveArtifacts artifacts: 'target/site/jacoco/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+
         stage('Docker Cleanup') {
             steps {
         sh '''
