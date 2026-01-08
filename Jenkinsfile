@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         MAVEN_OPTS = "-Dmaven.repo.local=.m2/repository"
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     }
 
     options {
@@ -16,9 +17,10 @@ pipeline {
     stages {
 stage('0- Docker Check') {
     steps {
-        sh 'which docker'
+        sh 'echo "PATH=$PATH"'
+        sh 'ls -l /opt/homebrew/bin/docker || true'
+        sh 'which docker || true'
         sh 'docker --version'
-        sh 'docker ps'
     }
 }
         stage('1- Checkout Code') {
@@ -109,14 +111,14 @@ stage('0- Docker Check') {
     }
 
     post {
-        always {
-            sh 'docker compose down'
-        }
-        success {
-            echo '✅ CI/CD başarıyla tamamlandı'
-        }
-        failure {
-            echo '❌ Pipeline başarısız'
-        }
+    always {
+        sh 'docker compose down || true'
     }
+    success {
+        echo '✅ CI/CD başarıyla tamamlandı'
+    }
+    failure {
+        echo '❌ Pipeline başarısız'
+    }
+}
 }
