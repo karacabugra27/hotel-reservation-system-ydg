@@ -5,6 +5,14 @@ pipeline {
         MAVEN_OPTS = "-Dmaven.repo.local=.m2/repository"
     }
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    triggers {
+        githubPush()
+    }
+
     stages {
 
         stage('1- Checkout Code') {
@@ -16,13 +24,14 @@ pipeline {
 
         stage('2- Build Project') {
             steps {
-                sh 'mvn clean compile'
+                sh 'chmod +x mvnw'
+                sh './mvnw clean compile'
             }
         }
 
         stage('3- Unit Tests') {
             steps {
-                sh 'mvn -Dtest=**/service/*Test,**/controller/*Test test'
+                sh './mvnw -Dtest=**/service/*Test,**/controller/*Test test'
             }
             post {
                 always {
@@ -33,7 +42,7 @@ pipeline {
 
         stage('4- Integration Tests') {
             steps {
-                sh 'mvn -Dtest=**/integration/*Test,*ApplicationTests test'
+                sh './mvnw -Dtest=**/integration/*Test,*ApplicationTests test'
             }
             post {
                 always {
@@ -53,15 +62,15 @@ pipeline {
 
         stage('5- Run System (Docker)') {
             steps {
-                sh 'docker-compose down -v || true'
-                sh 'docker-compose up -d --build'
+                sh 'docker compose down -v || true'
+                sh 'docker compose up -d --build'
                 sh 'sleep 30'
             }
         }
 
         stage('6- Selenium Smoke Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumSmokeSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumSmokeSuite'
             }
             post {
                 always {
@@ -72,7 +81,7 @@ pipeline {
 
         stage('7- Selenium Reservation Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumReservationSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumReservationSuite'
             }
             post {
                 always {
@@ -83,7 +92,7 @@ pipeline {
 
         stage('8- Selenium Lookup Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumLookupSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumLookupSuite'
             }
             post {
                 always {
@@ -95,7 +104,7 @@ pipeline {
 
     post {
         always {
-            sh 'docker-compose down'
+            sh 'docker compose down'
         }
         success {
             echo '✅ CI/CD başarıyla tamamlandı'
