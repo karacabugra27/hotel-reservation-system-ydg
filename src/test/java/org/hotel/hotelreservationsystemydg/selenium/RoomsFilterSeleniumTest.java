@@ -58,7 +58,12 @@ public class RoomsFilterSeleniumTest extends BaseSeleniumTest {
         WebElement typeFilter = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("[data-testid='filter-room-type']")));
-        Select typeSelect = new Select(typeFilter);
+        By typeFilterSelector = By.cssSelector("[data-testid='filter-room-type']");
+        wait.until(driver -> {
+            Select select = new Select(driver.findElement(typeFilterSelector));
+            return select.getOptions().size() > 1;
+        });
+        Select typeSelect = new Select(driver.findElement(typeFilterSelector));
 
         List<WebElement> options = typeSelect.getOptions();
         assertTrue(options.size() > 1, "En az bir oda tipi olmali");
