@@ -94,7 +94,7 @@ stage('0- Docker Check') {
 
         stage('6- Selenium Smoke Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumSmokeSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw verify -Dit.test=SeleniumSmokeSuite'
             }
             post {
                 always {
@@ -105,7 +105,7 @@ stage('0- Docker Check') {
 
         stage('7- Selenium Reservation Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumReservationSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw verify -Dit.test=SeleniumReservationSuite'
             }
             post {
                 always {
@@ -116,7 +116,7 @@ stage('0- Docker Check') {
 
         stage('8- Selenium Lookup Tests') {
             steps {
-                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw -DskipTests verify -Dit.test=SeleniumLookupSuite'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true ./mvnw verify -Dit.test=SeleniumLookupSuite'
             }
             post {
                 always {
