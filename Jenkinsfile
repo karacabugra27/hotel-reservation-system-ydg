@@ -22,7 +22,7 @@ pipeline {
 
         stage('3- Unit Tests') {
             steps {
-                sh 'mvn test'
+                sh 'mvn -Dtest=**/service/*Test,**/controller/*Test test'
             }
             post {
                 always {
@@ -33,7 +33,7 @@ pipeline {
 
         stage('4- Integration Tests') {
             steps {
-                sh 'mvn test'
+                sh 'mvn -Dtest=**/integration/*Test,*ApplicationTests test'
             }
             post {
                 always {
@@ -53,19 +53,42 @@ pipeline {
 
         stage('5- Run System (Docker)') {
             steps {
-                sh 'docker-compose down || true'
+                sh 'docker-compose down -v || true'
                 sh 'docker-compose up -d --build'
-                sh 'sleep 20'
+                sh 'sleep 30'
             }
         }
 
-
-        stage('6- Selenium Test 1 - Available Rooms') {
-            when {
-                expression { false }
-            }
+        stage('6- Selenium Smoke Tests') {
             steps {
-                echo 'Selenium şimdilik kapalı'
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumSmokeSuite'
+            }
+            post {
+                always {
+                    junit '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
+
+        stage('7- Selenium Reservation Tests') {
+            steps {
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumReservationSuite'
+            }
+            post {
+                always {
+                    junit '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
+
+        stage('8- Selenium Lookup Tests') {
+            steps {
+                sh 'APP_BASE_URL=http://localhost:5173 SELENIUM_HEADLESS=true mvn -DskipTests verify -Dit.test=SeleniumLookupSuite'
+            }
+            post {
+                always {
+                    junit '**/target/failsafe-reports/*.xml'
+                }
             }
         }
     }

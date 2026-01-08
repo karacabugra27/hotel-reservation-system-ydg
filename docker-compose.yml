@@ -22,12 +22,26 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: docker,selenium
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hotel_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8080
+    networks:
+      - hotel-network
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: hotel-frontend
+    container_name: hotel-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+    depends_on:
+      - app
     networks:
       - hotel-network
 

@@ -15,14 +15,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("selenium")
-public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
+public class ReservationLookupValidSeleniumTest extends BaseSeleniumTest {
 
     private WebDriver driver;
     private WebDriverWait wait;
@@ -49,69 +48,38 @@ public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
     }
 
     @Test
-    void musaitOdalarListelenebiliyor() {
-        driver.get(getBaseUrl());
-
-        WebElement homeButton = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        By.cssSelector("[data-testid='home-rooms-button']")));
-        homeButton.click();
-
-        WebElement roomsTitle = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("[data-testid='rooms-title']")));
-        assertTrue(roomsTitle.isDisplayed(), "Odalar basligi gorunur olmali");
-
-        WebElement typeFilter = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("[data-testid='filter-room-type']")));
-        Select typeSelect = new Select(typeFilter);
-        typeSelect.selectByValue("all");
+    void rezervasyonKoduIleSorguBasarili() {
+        driver.get(getBaseUrl() + "/rooms");
 
         List<WebElement> detailButtons = wait.until(
                 ExpectedConditions.numberOfElementsToBeMoreThan(
                         By.cssSelector("[data-testid^='room-detail-button-']"), 0));
         detailButtons.get(0).click();
 
-        WebElement detailReserve = wait.until(
+        WebElement reserveButton = wait.until(
                 ExpectedConditions.elementToBeClickable(
                         By.cssSelector("[data-testid='room-detail-reserve']")));
-        detailReserve.click();
-
-        WebElement reservationTitle = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("[data-testid='reservation-title']")));
-        assertTrue(reservationTitle.isDisplayed(), "Rezervasyon sayfasi acilmali");
+        reserveButton.click();
 
         driver.findElement(By.cssSelector("[data-testid='reservation-first-name']"))
-                .sendKeys("Akademik");
+                .sendKeys("Lookup");
         driver.findElement(By.cssSelector("[data-testid='reservation-last-name']"))
                 .sendKeys("Test");
         driver.findElement(By.cssSelector("[data-testid='reservation-phone']"))
-                .sendKeys("5551112233");
+                .sendKeys("5559998877");
 
-        LocalDate checkIn = LocalDate.now().plusDays(1);
-        LocalDate checkOut = LocalDate.now().plusDays(2);
+        LocalDate checkIn = LocalDate.now().plusDays(5);
+        LocalDate checkOut = LocalDate.now().plusDays(6);
         clickDay(checkIn);
         clickDay(checkOut);
 
         driver.findElement(By.cssSelector("[data-testid='reservation-submit']")).click();
 
-        WebElement successAlert = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("[data-testid='reservation-success']")));
-        assertTrue(successAlert.isDisplayed(), "Rezervasyon basarili olmali");
-
-        WebElement summaryCard = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("[data-testid='reservation-summary']")));
-        assertTrue(summaryCard.isDisplayed(), "Rezervasyon ozeti gorunmeli");
-
         WebElement reservationCode = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("[data-testid='reservation-code']")));
-        String reservationCodeValue = reservationCode.getText();
-        assertFalse(reservationCodeValue.isBlank(), "Rezervasyon kodu bos olmamali");
+        String reservationCodeValue = reservationCode.getText().replaceAll("\\s", "");
+        assertFalse(reservationCodeValue.isBlank(), "Rezervasyon kodu gelmeli");
 
         WebElement lookupButton = wait.until(
                 ExpectedConditions.elementToBeClickable(
@@ -121,14 +89,14 @@ public class AvailableRoomsSeleniumTest extends BaseSeleniumTest {
         WebElement lookupInput = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("[data-testid='reservation-lookup-input']")));
-        lookupInput.sendKeys(reservationCodeValue.replaceAll("\\s", ""));
+        lookupInput.sendKeys(reservationCodeValue);
 
         driver.findElement(By.cssSelector("[data-testid='reservation-lookup-submit']")).click();
 
-        WebElement lookupSummary = wait.until(
+        WebElement summaryCard = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector("[data-testid='reservation-summary']")));
-        assertTrue(lookupSummary.isDisplayed(), "Sorgu sonucu gorunmeli");
+        assertTrue(summaryCard.isDisplayed(), "Rezervasyon ozeti gorunmeli");
     }
 
     private void clickDay(LocalDate date) {
