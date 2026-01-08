@@ -61,12 +61,14 @@ stage('0- Docker Check') {
 
         stage('Docker Cleanup') {
             steps {
-                sh '''
-                docker rm -f hotel-postgres || true
-                docker rm -f hotel-app || true
-                '''
-            }
-        }
+        sh '''
+        docker compose down -v || true
+        docker rm -f hotel-postgres || true
+        docker rm -f hotel-app || true
+        docker rm -f hotel-frontend || true
+        '''
+    }
+}
 
         stage('5- Run System (Docker)') {
             steps {
