@@ -14,7 +14,13 @@ pipeline {
     }
 
     stages {
-
+stage('0- Docker Check') {
+    steps {
+        sh 'which docker'
+        sh 'docker --version'
+        sh 'docker ps'
+    }
+}
         stage('1- Checkout Code') {
             steps {
                 git url: 'https://github.com/karacabugra27/hotel-reservation-system-ydg.git',
